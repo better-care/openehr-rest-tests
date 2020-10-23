@@ -1,0 +1,40 @@
+<composition>
+    <subjectId>$subjectId</subjectId>
+    <subjectNamespace>$subjectNamespace</subjectNamespace>
+    <templateId>Liver Recipient Information</templateId>
+    <committerName>John Smith</committerName>
+    <ctx>
+        <language>en</language>
+        <territory>NL</territory>
+        <composer_name>John Smith</composer_name>
+    </ctx>
+    <encounter>
+        <meld>
+            <meld_score>
+                <sample_date>2016-08-24T09:02:08.127+02:00</sample_date>
+                <creatinine>
+                    <magnitude>95.69</magnitude>
+                    <unit>mg/dL</unit>
+                </creatinine>
+                <bilirubin>
+                    <magnitude>34</magnitude>
+                    <unit>mg/dL</unit>
+                </bilirubin>
+                <albumin>
+                    <magnitude>35.35</magnitude>
+                    <unit>mg/dL</unit>
+                </albumin>
+                <sodium>
+                    <magnitude>58.116</magnitude>
+                    <unit>mmol/l</unit>
+                </sodium>
+                <inr>
+                    <magnitude>95.69</magnitude>
+                    <unit/>
+                </inr>
+                <dialysis_at_least_twice_in_the_past_week>true</dialysis_at_least_twice_in_the_past_week>
+                <initiated_mars_therapy>true</initiated_mars_therapy>
+            </meld_score>
+        </meld>
+    </encounter>
+</composition>

@@ -1,0 +1,2738 @@
+{
+  "_type": "COMPOSITION",
+  "name": {
+    "_type": "DV_TEXT",
+    "value": "Bericht"
+  },
+  "uid": {
+    "_type": "OBJECT_VERSION_ID",
+    "value": "74a6c070-d516-4be6-af19-4d91a0d6f714::prod.pediatrics.marand.si::1"
+  },
+  "archetype_details": {
+    "_type": "ARCHETYPED",
+    "archetype_id": {
+      "_type": "ARCHETYPE_ID",
+      "value": "openEHR-EHR-COMPOSITION.report.v0"
+    },
+    "template_id": {
+      "_type": "TEMPLATE_ID",
+      "value": "MedikationLoop"
+    },
+    "rm_version": "1.0.4"
+  },
+  "archetype_node_id": "openEHR-EHR-COMPOSITION.report.v0",
+  "language": {
+    "_type": "CODE_PHRASE",
+    "terminology_id": {
+      "_type": "TERMINOLOGY_ID",
+      "value": "ISO_639-1"
+    },
+    "code_string": "de"
+  },
+  "territory": {
+    "_type": "CODE_PHRASE",
+    "terminology_id": {
+      "_type": "TERMINOLOGY_ID",
+      "value": "ISO_3166-1"
+    },
+    "code_string": "DE"
+  },
+  "category": {
+    "_type": "DV_CODED_TEXT",
+    "value": "event",
+    "defining_code": {
+      "_type": "CODE_PHRASE",
+      "terminology_id": {
+        "_type": "TERMINOLOGY_ID",
+        "value": "openehr"
+      },
+      "code_string": "433"
+    }
+  },
+  "composer": {
+    "_type": "PARTY_IDENTIFIED",
+    "name": "Talend Medikationsstrecke MEDI-HIGHM_0001"
+  },
+  "context": {
+    "_type": "EVENT_CONTEXT",
+    "start_time": {
+      "_type": "DV_DATE_TIME",
+      "value": "2019-07-04"
+    },
+    "setting": {
+      "_type": "DV_CODED_TEXT",
+      "value": "other care",
+      "defining_code": {
+        "_type": "CODE_PHRASE",
+        "terminology_id": {
+          "_type": "TERMINOLOGY_ID",
+          "value": "openehr"
+        },
+        "code_string": "238"
+      }
+    },
+    "other_context": {
+      "_type": "ITEM_TREE",
+      "name": {
+        "_type": "DV_TEXT",
+        "value": "Tree"
+      },
+      "archetype_node_id": "at0001",
+      "items": [
+        {
+          "_type": "ELEMENT",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Bericht ID"
+          },
+          "archetype_node_id": "at0002",
+          "value": {
+            "_type": "DV_TEXT",
+            "value": "0000000000000010080827600"
+          }
+        },
+        {
+          "_type": "ELEMENT",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Status"
+          },
+          "archetype_node_id": "at0005",
+          "value": {
+            "_type": "DV_TEXT",
+            "value": "F"
+          }
+        }
+      ]
+    },
+    "health_care_facility": {
+      "_type": "PARTY_IDENTIFIED",
+      "external_ref": {
+        "_type": "PARTY_REF",
+        "id": {
+          "_type": "GENERIC_ID",
+          "value": "1.2.276.0.76.3.1.78",
+          "scheme": "OID"
+        },
+        "namespace": "OID",
+        "type": "PARTY"
+      },
+      "name": "University Hospital of Heidelberg"
+    }
+  },
+  "content": [
+    {
+      "_type": "SECTION",
+      "name": {
+        "_type": "DV_TEXT",
+        "value": "Medikamente"
+      },
+      "archetype_details": {
+        "_type": "ARCHETYPED",
+        "archetype_id": {
+          "_type": "ARCHETYPE_ID",
+          "value": "openEHR-EHR-SECTION.adhoc.v0"
+        },
+        "rm_version": "1.0.4"
+      },
+      "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+      "items": [
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "ACE-Hemmer"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "ACE-Hemmer",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "ACEHem"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "AT1-Rezeptorantagonist"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Zusammenfassung der Medikation"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.medication_summary.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.medication_summary.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Name des Medikaments"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "AT1-Rezeptorantagonist",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C09CA"
+                      }
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Jemals angewendet?"
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aktuelle Anwendung?"
+                    },
+                    "archetype_node_id": "at0004",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Betablocker"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Betablocker",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C07A"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Sacubitril/Valsartan (Entresto)"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Sacubitril/Valsartan (Entresto)",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C09DX04"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Anderes Antiarrhythmikum"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Anderes Antiarrhythmikum",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "ANDAARH"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Thiazid"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Thiazid",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C03A"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Schleifendiuretikum"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Zusammenfassung der Medikation"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.medication_summary.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.medication_summary.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Name des Medikaments"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Schleifendiuretikum",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C03C"
+                      }
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Jemals angewendet?"
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aktuelle Anwendung?"
+                    },
+                    "archetype_node_id": "at0004",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Aldosteron-Antagonist"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Zusammenfassung der Medikation"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.medication_summary.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.medication_summary.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Name des Medikaments"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Aldosteron-Antagonist",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C03DA"
+                      }
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Jemals angewendet?"
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aktuelle Anwendung?"
+                    },
+                    "archetype_node_id": "at0004",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Anderes Diuretikum"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Anderes Diuretikum",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "ANDDIU"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Herzglykosid"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Herzglykosid",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C01A"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Nitrat"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Nitrat",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C01DA"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Ca-Antagonist"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Ca-Antagonist",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C08"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Amiodaron"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Amiodaron",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C01BD01"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Ivabradin"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Ivabradin",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C01EB17"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Statin"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Statin",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "C10AA"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Anderer Lipidsenker"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Anderer Lipidsenker",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "ANDLIP"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "ASS"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "ASS",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "ASS"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Thienopyridin(Prasugrel, Ticagrelor,Thienopyridine(z.B. Clopidogrel))"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Thienopyridin(Prasugrel, Ticagrelor,Thienopyridine(z.B. Clopidogrel))",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "THIPY"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Vitamin K-Antagonist"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Vitamin K-Antagonist",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "B01AA"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Neues Orales Antikoagulans(NOACs)"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Neues Orales Antikoagulans(NOACs)",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "HDKARDIOMEDI"
+                        },
+                        "code_string": "NOACs"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Insulin"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Insulin",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "A10A"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Orales Antidiabetikum"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Orales Antidiabetikum",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "A10B"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "NSAIDs"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Ausschluss - spezifisch"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.exclusion_specific.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.exclusion_specific.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aussage über den Ausschluss"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_TEXT",
+                      "value": "keine aktuelle Anwendung der Medikamentenklasse"
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Medikation",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "local"
+                        },
+                        "code_string": "at0006"
+                      }
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "NSAIDs",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "M01A"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Antiobstruktives pulmonales Medikament"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Zusammenfassung der Medikation"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.medication_summary.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.medication_summary.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Name des Medikaments"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Antiobstruktives pulmonales Medikament",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "R03"
+                      }
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Jemals angewendet?"
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aktuelle Anwendung?"
+                    },
+                    "archetype_node_id": "at0004",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "_type": "SECTION",
+          "name": {
+            "_type": "DV_TEXT",
+            "value": "Antidepressivum"
+          },
+          "archetype_details": {
+            "_type": "ARCHETYPED",
+            "archetype_id": {
+              "_type": "ARCHETYPE_ID",
+              "value": "openEHR-EHR-SECTION.adhoc.v0"
+            },
+            "rm_version": "1.0.4"
+          },
+          "archetype_node_id": "openEHR-EHR-SECTION.adhoc.v0",
+          "items": [
+            {
+              "_type": "EVALUATION",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "Zusammenfassung der Medikation"
+              },
+              "archetype_details": {
+                "_type": "ARCHETYPED",
+                "archetype_id": {
+                  "_type": "ARCHETYPE_ID",
+                  "value": "openEHR-EHR-EVALUATION.medication_summary.v0"
+                },
+                "rm_version": "1.0.4"
+              },
+              "archetype_node_id": "openEHR-EHR-EVALUATION.medication_summary.v0",
+              "language": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "ISO_639-1"
+                },
+                "code_string": "de"
+              },
+              "encoding": {
+                "_type": "CODE_PHRASE",
+                "terminology_id": {
+                  "_type": "TERMINOLOGY_ID",
+                  "value": "IANA_character-sets"
+                },
+                "code_string": "UTF-8"
+              },
+              "subject": {
+                "_type": "PARTY_SELF"
+              },
+              "data": {
+                "_type": "ITEM_TREE",
+                "name": {
+                  "_type": "DV_TEXT",
+                  "value": "Tree"
+                },
+                "archetype_node_id": "at0001",
+                "items": [
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Name des Medikaments"
+                    },
+                    "archetype_node_id": "at0002",
+                    "value": {
+                      "_type": "DV_CODED_TEXT",
+                      "value": "Antidepressivum",
+                      "defining_code": {
+                        "_type": "CODE_PHRASE",
+                        "terminology_id": {
+                          "_type": "TERMINOLOGY_ID",
+                          "value": "ATC"
+                        },
+                        "code_string": "N06A"
+                      }
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Jemals angewendet?"
+                    },
+                    "archetype_node_id": "at0003",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  },
+                  {
+                    "_type": "ELEMENT",
+                    "name": {
+                      "_type": "DV_TEXT",
+                      "value": "Aktuelle Anwendung?"
+                    },
+                    "archetype_node_id": "at0004",
+                    "value": {
+                      "_type": "DV_BOOLEAN",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

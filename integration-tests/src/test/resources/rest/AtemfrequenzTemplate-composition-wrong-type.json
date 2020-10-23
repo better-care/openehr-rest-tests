@@ -1,0 +1,522 @@
+{
+  "_type": "BLABLABLA",
+  "name": {
+    "_type": "DV_TEXT",
+    "value": "Report"
+  },
+  "archetype_details": {
+    "_type": "ARCHETYPED",
+    "archetype_id": {
+      "_type": "ARCHETYPE_ID",
+      "value": "openEHR-EHR-COMPOSITION.report.v2"
+    },
+    "template_id": {
+      "_type": "TEMPLATE_ID",
+      "value": "AtemfrequenzTemplate"
+    },
+    "rm_version": "1.0.4"
+  },
+  "archetype_node_id": "openEHR-EHR-COMPOSITION.report.v2",
+  "language": {
+    "_type": "CODE_PHRASE",
+    "terminology_id": {
+      "_type": "TERMINOLOGY_ID",
+      "value": "ISO_639-1"
+    },
+    "code_string": "de"
+  },
+  "territory": {
+    "_type": "CODE_PHRASE",
+    "terminology_id": {
+      "_type": "TERMINOLOGY_ID",
+      "value": "ISO_3166-1"
+    },
+    "code_string": "DE"
+  },
+  "category": {
+    "_type": "DV_CODED_TEXT",
+    "value": "event",
+    "defining_code": {
+      "_type": "CODE_PHRASE",
+      "terminology_id": {
+        "_type": "TERMINOLOGY_ID",
+        "value": "openehr"
+      },
+      "code_string": "433"
+    }
+  },
+  "composer": {
+    "_type": "PARTY_IDENTIFIED",
+    "name": "Jane Nurse"
+  },
+  "context": {
+    "_type": "EVENT_CONTEXT",
+    "start_time": {
+      "_type": "DV_DATE_TIME",
+      "value": "2020-10-23T16:07:13.651+02:00"
+    },
+    "setting": {
+      "_type": "DV_CODED_TEXT",
+      "value": "other care",
+      "defining_code": {
+        "_type": "CODE_PHRASE",
+        "terminology_id": {
+          "_type": "TERMINOLOGY_ID",
+          "value": "openehr"
+        },
+        "code_string": "238"
+      }
+    },
+    "health_care_facility": {
+      "_type": "PARTY_IDENTIFIED",
+      "name": "194"
+    }
+  },
+  "content": [
+    {
+      "_type": "OBSERVATION",
+      "name": {
+        "_type": "DV_TEXT",
+        "value": "*Respirations(en)"
+      },
+      "archetype_details": {
+        "_type": "ARCHETYPED",
+        "archetype_id": {
+          "_type": "ARCHETYPE_ID",
+          "value": "openEHR-EHR-OBSERVATION.respiration.v1"
+        },
+        "rm_version": "1.0.4"
+      },
+      "archetype_node_id": "openEHR-EHR-OBSERVATION.respiration.v1",
+      "language": {
+        "_type": "CODE_PHRASE",
+        "terminology_id": {
+          "_type": "TERMINOLOGY_ID",
+          "value": "ISO_639-1"
+        },
+        "code_string": "de"
+      },
+      "encoding": {
+        "_type": "CODE_PHRASE",
+        "terminology_id": {
+          "_type": "TERMINOLOGY_ID",
+          "value": "IANA_character-sets"
+        },
+        "code_string": "UTF-8"
+      },
+      "subject": {
+        "_type": "PARTY_SELF"
+      },
+      "data": {
+        "_type": "HISTORY",
+        "name": {
+          "_type": "DV_TEXT",
+          "value": "History"
+        },
+        "archetype_node_id": "at0001",
+        "origin": {
+          "_type": "DV_DATE_TIME",
+          "value": "2016-09-19T15:12:00+02:00"
+        },
+        "events": [
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T21:45:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #2"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T22:00:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #3"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T22:15:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #4"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T22:30:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #5"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T22:45:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #6"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T23:00:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #7"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T23:25:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #8"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T23:30:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #9"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T23:45:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 24.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #10"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T15:12:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 36.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "_type": "POINT_EVENT",
+            "name": {
+              "_type": "DV_TEXT",
+              "value": "Any event #11"
+            },
+            "archetype_node_id": "at0002",
+            "time": {
+              "_type": "DV_DATE_TIME",
+              "value": "2016-09-19T15:13:00+02:00"
+            },
+            "data": {
+              "_type": "ITEM_TREE",
+              "name": {
+                "_type": "DV_TEXT",
+                "value": "*List(en)"
+              },
+              "archetype_node_id": "at0003",
+              "items": [
+                {
+                  "_type": "ELEMENT",
+                  "name": {
+                    "_type": "DV_TEXT",
+                    "value": "*Rate(en)"
+                  },
+                  "archetype_node_id": "at0004",
+                  "value": {
+                    "_type": "DV_QUANTITY",
+                    "magnitude": 27.0,
+                    "units": "/min",
+                    "precision": 0
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
