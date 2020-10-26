@@ -4,10 +4,6 @@
     "_type": "DV_TEXT",
     "value": "Bericht"
   },
-  "uid": {
-    "_type": "OBJECT_VERSION_ID",
-    "value": "74a6c070-d516-4be6-af19-4d91a0d6f714::prod.pediatrics.marand.si::1"
-  },
   "archetype_details": {
     "_type": "ARCHETYPED",
     "archetype_id": {

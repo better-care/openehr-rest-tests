@@ -47,7 +47,7 @@
   },
   "composer": {
     "_type": "PARTY_IDENTIFIED",
-    "name": "{{REPLACE_THIS}}"
+    "name": "restTest"
   },
   "context": {
     "_type": "EVENT_CONTEXT",
@@ -159,7 +159,7 @@
                       "archetype_node_id": "at0004",
                       "value": {
                         "_type": "DV_QUANTITY",
-                        "magnitude": 37.2,
+                        "magnitude": 40.7,
                         "units": "°C"
                       }
                     },
@@ -202,7 +202,7 @@
                       "archetype_node_id": "at0041",
                       "value": {
                         "_type": "DV_TEXT",
-                        "value": "Test description of symptoms"
+                        "value": "Test description of symptoms 5"
                       }
                     }
                   ]

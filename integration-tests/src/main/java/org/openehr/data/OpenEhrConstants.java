@@ -1,6 +1,5 @@
 package org.openehr.data;
 
-import org.openehr.ResultWithContributionWrapper;
 import org.openehr.rest.exception.OpenEhrRestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;

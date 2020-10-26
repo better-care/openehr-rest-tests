@@ -1,7 +1,6 @@
 package org.openehr.rest;
 
 import care.better.platform.locatable.LocatableUid;
-import care.better.platform.model.Ehr;
 import care.better.platform.model.VersionedObjectDto;
 import care.better.platform.service.VersionLifecycleState;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrConstants;
 import org.openehr.data.OpenEhrErrorResponse;
-import org.openehr.jaxb.am.Template;
 import org.openehr.jaxb.rm.Composition;
 import org.openehr.jaxb.rm.HierObjectId;
 import org.openehr.jaxb.rm.Locatable;
@@ -32,9 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +38,6 @@ import static org.openehr.data.OpenEhrConstants.*;
 import static org.springframework.http.HttpHeaders.IF_MATCH;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.APPLICATION_XML;
 
 /**
  * @author Dusan Markovic
@@ -56,61 +51,29 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    protected String compositionUid;
-    protected String compositionUid5;
-    protected String nonExistingUid;
-    private Composition composition;
     private Composition compositionUpdated;
     private String compositionWrongType;
-    protected String ehrId;
+    private DateTime before;
 
     @PostConstruct
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        String atemfrequenzTemplate = IOUtils.toString(
-                OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate.opt"),
-                StandardCharsets.UTF_8);
-
-        String medikationLoopTemplate = IOUtils.toString(
-                OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/MedikationLoop.opt"),
-                StandardCharsets.UTF_8);
 
         String jsonCompositionWithPlaceholder = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate-composition.json"),
                 StandardCharsets.UTF_8);
-        composition = objectMapper.readValue(jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "Jane Nurse"), Composition.class);
-        assertThat(composition).isNotNull();
-        assertThat(composition.getUid()).isNull();
         compositionUpdated = objectMapper.readValue(jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "John Nurse"), Composition.class);
         compositionWrongType = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate-composition-wrong-type.json"),
                 StandardCharsets.UTF_8);
 
-        ResponseEntity<Ehr> ehrResponseEntity = exchange(getTargetPath() + "/ehr", POST, null, Ehr.class, fullRepresentationHeaders());
-        ehrId = Objects.requireNonNull(ehrResponseEntity.getBody()).getEhrId().getValue();
-        HttpHeaders headers = fullRepresentationHeaders();
-        headers.setContentType(APPLICATION_XML);
-        headers.setAccept(Collections.singletonList(APPLICATION_XML));
-        ResponseEntity<Template> templateResponseEntity = exchange(
-                getTargetPath() + "/definition/template/adl1.4", POST, atemfrequenzTemplate, Template.class, headers);
-        assertThat(templateResponseEntity.getStatusCode()).isEqualTo(CREATED);
-        ResponseEntity<Template> medikationLoopEntity = exchange(
-                getTargetPath() + "/definition/template/adl1.4", POST, medikationLoopTemplate, Template.class, headers);
-        assertThat(medikationLoopEntity.getStatusCode()).isEqualTo(CREATED);
-        Composition medikationLoopComposition = objectMapper.readValue(IOUtils.toString(
-                OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/MedikationLoop.json"),
-                StandardCharsets.UTF_8), Composition.class);
-        try {
-            ResponseEntity<Composition> response = exchange(
-                    getTargetPath() + POST_COMPOSITION_PATH, POST, medikationLoopComposition, Composition.class, fullRepresentationHeaders(), ehrId);
-            assertThat(response.getStatusCode()).isEqualTo(CREATED);
-            compositionUid = Objects.requireNonNull(response.getBody()).getUid().getValue();
-            compositionUid5 = compositionUid;
-            nonExistingUid = UUID.randomUUID() + "::domain3::1";
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        uploadTemplate("/rest/AtemfrequenzTemplate.opt");
+        uploadTemplate("/rest/MedikationLoop.opt");
+
+        String anotherComposition = jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "Just Someone");
+        compositionUid2 = postComposition(ehrId, objectMapper.readValue(anotherComposition, Composition.class));
+        before = DateTime.now();
     }
 
     @Test
@@ -150,7 +113,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     public void createCompositionValidationErrors() {
         HttpHeaders headers = fullRepresentationHeaders();
         ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, headers, ehrId);
+                getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
         validateLocationAndETag(response, false, false);
         JsonNode body = response.getBody();
@@ -163,7 +126,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         HttpHeaders headers = fullRepresentationHeaders();
         headers.add(OpenEhrConstants.VERSION_LIFECYCLE_STATE, "code_string=\"" + VersionLifecycleState.INCOMPLETE.code() + "\"");
         ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, headers, ehrId);
+                getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
         validateLocationAndETag(response, false, false);
         JsonNode body = response.getBody();
@@ -255,7 +218,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         String compositionSimpleUid = new LocatableUid(compositionUid).getUid();
 
         ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, ehrId, compositionSimpleUid);
+                getTargetPath() + GET_COMPOSITION_PATH, PUT, unProcessableComposition, JsonNode.class, headers, ehrId, compositionSimpleUid);
         assertThat(response.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
         validateLocationAndETag(response, false, false);
         JsonNode body = response.getBody();
@@ -409,10 +372,10 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void retrieveCompositionByVersionAtTime204() {
         ResponseEntity<String> response1 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, null, ehrId, compositionUid5);
+                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, null, ehrId, compositionUid2);
         assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response1);
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 204 get deleted composition
         ResponseEntity<Composition> response = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
@@ -426,7 +389,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
     @Test
     public void retrieveCompositionByVersionAtTime404() {
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 404 nonexistent ehr
         ResponseEntity<OpenEhrErrorResponse> response = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
@@ -461,7 +424,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
     @Test
     public void retrieveVersionedComposition() {
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
         ResponseEntity<VersionedObjectDto> response = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
                 VersionedObjectDto.class,
@@ -473,7 +436,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
     @Test
     public void retrieveVersionedComposition404() {
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 404 nonexistent ehr
         ResponseEntity<OpenEhrErrorResponse> response = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
@@ -494,7 +457,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void retrieveCompositionVersion() {
 
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
         ResponseEntity<OriginalVersion> response = getResponse(
                 getTargetPath() + GET_COMPOSITION_VERSION_PATH,
                 OriginalVersion.class,
@@ -513,7 +476,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
     @Test
     public void retrieveCompositionVersion404() {
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 404 nonexistent ehr
         ResponseEntity<OpenEhrErrorResponse> response = getResponse(
                 getTargetPath() + GET_COMPOSITION_VERSION_PATH,
@@ -542,32 +505,42 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         assertThat(response2.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 400 different system id
+        LocatableUid locatableUid1 = new LocatableUid(nonExistingUid);
         ResponseEntity<OpenEhrErrorResponse> response4 = getResponse(
+                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                OpenEhrErrorResponse.class,
+                ehrId,
+                locatableUid1.getUid(),
+                nonExistingUid);
+        assertThat(response4.getStatusCode()).isEqualTo(BAD_REQUEST);
+
+        // 404 uid not matching
+        ResponseEntity<OpenEhrErrorResponse> response5 = getResponse(
                 getTargetPath() + GET_COMPOSITION_VERSION_PATH,
                 OpenEhrErrorResponse.class,
                 ehrId,
                 locatableUid.getUid(),
                 nonExistingUid);
-        assertThat(response4.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(response5.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 nonexistent version
-        LocatableUid locatableUid1 = new LocatableUid(nonExistingUid);
+        String uid = locatableUid.getUid();
+        LocatableUid locatableUid2 = new LocatableUid(uid, "some.other.system", locatableUid.getVersion());
         ResponseEntity<OpenEhrErrorResponse> response3 = getResponse(
                 getTargetPath() + GET_COMPOSITION_VERSION_PATH,
                 OpenEhrErrorResponse.class,
                 ehrId,
-                locatableUid1.getUid(),
-                locatableUid1.toString());
+                uid,
+                locatableUid2.toString());
         assertThat(response3.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
-    public void retrieveCompositionVersionAtTime() {
-        LocatableUid locatableUid = new LocatableUid(compositionUid5);
-        DateTime before = DateTime.now();
-
+    public void retrieveCompositionVersionAtTime() throws InterruptedException {
+        LocatableUid locatableUid = new LocatableUid(compositionUid2);
+        Thread.sleep(100);
         ResponseEntity<String> response1 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, null, ehrId, compositionUid5);
+                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, null, ehrId, compositionUid2);
         assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response1);
 

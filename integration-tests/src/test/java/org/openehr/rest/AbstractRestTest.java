@@ -1,8 +1,23 @@
 package org.openehr.rest;
 
+import care.better.platform.locatable.LocatableUid;
+import care.better.platform.model.Ehr;
+import care.better.platform.model.EhrStatus;
+import care.better.platform.openehr.rm.RmObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.openehr.jaxb.am.Template;
+import org.openehr.jaxb.rm.Composition;
+import org.openehr.jaxb.rm.Folder;
+import org.openehr.jaxb.rm.GenericId;
+import org.openehr.jaxb.rm.ObjectRef;
+import org.openehr.jaxb.rm.ObjectVersionId;
+import org.openehr.jaxb.rm.PartyRef;
+import org.openehr.jaxb.rm.PartySelf;
 import org.openehr.rest.conf.WebClientConfiguration;
+import org.openehr.utils.FolderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,6 +29,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -22,12 +38,20 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.openehr.data.OpenEhrConstants.POST_COMPOSITION_PATH;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
 
 /**
  * @author Dusan Markovic
@@ -35,6 +59,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @ContextConfiguration(classes = WebClientConfiguration.class)
 public class AbstractRestTest {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
+    private static final Pattern HEADER_ETAG_PATTERN = Pattern.compile("W/\"|\"");
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Autowired
     protected RestTemplate restTemplate;
@@ -42,10 +70,31 @@ public class AbstractRestTest {
     protected URI uri;
 
     protected String targetPath;
+    protected String ehrId;
+    protected String nonExistingUid;
+    protected String compositionUid;
+    protected String compositionUid2;
+    protected Composition composition;
+    protected Composition unProcessableComposition;
 
     @PostConstruct
     public void setUp() throws IOException {
         targetPath = uri.toURL().toString();
+        nonExistingUid = UUID.randomUUID() + "::domain3::1";
+        ResponseEntity<Ehr> ehrResponseEntity = exchange(getTargetPath() + "/ehr", POST, null, Ehr.class, fullRepresentationHeaders());
+        ehrId = Objects.requireNonNull(ehrResponseEntity.getBody()).getEhrId().getValue();
+
+        composition = objectMapper.readValue(IOUtils.toString(
+                        OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/composition.json"),
+                        StandardCharsets.UTF_8).replace("{{REPLACE_THIS}}", "Jane Nurse"), Composition.class);
+        assertThat(composition).isNotNull();
+        assertThat(composition.getUid()).isNull();
+        compositionUid = postComposition(ehrId, composition);
+        String jsonCompositionWithPlaceholder = IOUtils.toString(
+                OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate-composition.json"),
+                StandardCharsets.UTF_8);
+        unProcessableComposition = objectMapper.readValue(jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "John Nurse"), Composition.class);
+        unProcessableComposition.setArchetypeNodeId("openEHR-EHR-COMPOSITION.report.sv2");
     }
 
     public String getTargetPath() {
@@ -210,7 +259,7 @@ public class AbstractRestTest {
             } else if (r.getStatusCode() == NO_CONTENT) {
                 assertThat(r.getBody()).isNull();
             } else {
-                throw new RuntimeException("Unable to validate location header: " + locationUri);
+                throw new RuntimeException("Unable to validate location header: " + locationUri + " Response: " + r.toString());
             }
         } else {
             assertThat(locationUri).isNull();
@@ -236,5 +285,82 @@ public class AbstractRestTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Prefer", "return=representation");
         return headers;
+    }
+
+    protected Folder createFolderWithSubfolder(String subFolderName, String mainFolderName) {
+        return FolderBuilder.createFolder()
+                .withName(mainFolderName)
+                .withItems(createFolderItem())
+                .withSubfolder(
+                        FolderBuilder.createFolder()
+                                .withName(subFolderName)
+                                .withItems(createFolderItem())
+                                .build()).build();
+    }
+
+    private ObjectRef createFolderItem() {
+        ObjectVersionId objectVersionId = new ObjectVersionId();
+        objectVersionId.setValue(UUID.randomUUID().toString());
+
+        ObjectRef item = new ObjectRef();
+        item.setId(objectVersionId);
+        item.setNamespace("namespace");
+        item.setType("ANY");
+        return item;
+    }
+
+    protected <T extends RmObject> void validateLocationHeader(
+            Class<T> objectClass,
+            URI location,
+            String folderStringToCheck,
+            Function<T, String> compareStringGetter) {
+        ResponseEntity<T> response = getResponse(location.toString(), objectClass);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        T object = response.getBody();
+        assertThat(object).isNotNull();
+        assertThat(folderStringToCheck).isEqualTo(compareStringGetter.apply(object));
+    }
+
+    protected String postComposition(String ehrId, Composition medikationLoopComposition) {
+        ResponseEntity<Composition> response = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, medikationLoopComposition, Composition.class, fullRepresentationHeaders(), ehrId);
+        assertThat(response.getStatusCode()).isEqualTo(CREATED);
+        return Objects.requireNonNull(response.getBody()).getUid().getValue();
+    }
+
+    protected void setCompositionUid(@javax.annotation.Nullable Composition composition, LocatableUid compositionUid) {
+        if (composition != null) {
+            ObjectVersionId objectVersionId = new ObjectVersionId();
+            objectVersionId.setValue(compositionUid.toString());
+            composition.setUid(objectVersionId);
+        }
+    }
+
+    protected String getHeaderETag(ResponseEntity<?> response) {
+        String eTag = response.getHeaders().getETag();
+        return eTag != null ? HEADER_ETAG_PATTERN.matcher(eTag).replaceAll("") : null;
+    }
+
+    protected <D> D getBody(ResponseEntity<D> response) {
+        D body = response.getBody();
+        assertThat(body).isNotNull();
+        return body;
+    }
+
+    protected String createRandomNumString() {
+        Random random = new Random();
+        return String.valueOf(random.nextInt());
+    }
+
+    protected void uploadTemplate(@Nonnull String templatePath) throws IOException {
+        String templateString = IOUtils.toString(
+                OpenEhrCompositionRestTest.class.getResourceAsStream(templatePath),
+                StandardCharsets.UTF_8);
+        HttpHeaders headers = fullRepresentationHeaders();
+        headers.setContentType(APPLICATION_XML);
+        headers.setAccept(Collections.singletonList(APPLICATION_XML));
+        ResponseEntity<Template> templateResponseEntity = exchange(
+                getTargetPath() + "/definition/template/adl1.4", POST, templateString, Template.class, headers);
+        assertThat(templateResponseEntity.getStatusCode()).isEqualTo(CREATED);
     }
 }

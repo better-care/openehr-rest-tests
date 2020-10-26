@@ -1,4 +1,4 @@
-package org.openehr;
+package org.openehr.data;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
