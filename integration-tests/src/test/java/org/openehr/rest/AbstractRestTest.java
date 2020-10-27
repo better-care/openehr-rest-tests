@@ -2,20 +2,17 @@ package org.openehr.rest;
 
 import care.better.platform.locatable.LocatableUid;
 import care.better.platform.model.Ehr;
-import care.better.platform.model.EhrStatus;
-import care.better.platform.openehr.rm.RmObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.openehr.jaxb.am.Template;
 import org.openehr.jaxb.rm.Composition;
 import org.openehr.jaxb.rm.Folder;
-import org.openehr.jaxb.rm.GenericId;
 import org.openehr.jaxb.rm.ObjectRef;
 import org.openehr.jaxb.rm.ObjectVersionId;
-import org.openehr.jaxb.rm.PartyRef;
-import org.openehr.jaxb.rm.PartySelf;
 import org.openehr.rest.conf.WebClientConfiguration;
 import org.openehr.utils.FolderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +27,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nonnull;
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -49,13 +45,13 @@ import static org.openehr.data.OpenEhrConstants.POST_COMPOSITION_PATH;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
 /**
  * @author Dusan Markovic
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration(classes = WebClientConfiguration.class)
 public class AbstractRestTest {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
@@ -77,7 +73,7 @@ public class AbstractRestTest {
     protected Composition composition;
     protected Composition unProcessableComposition;
 
-    @PostConstruct
+    @BeforeAll
     public void setUp() throws IOException {
         targetPath = uri.toURL().toString();
         nonExistingUid = UUID.randomUUID() + "::domain3::1";
@@ -309,7 +305,7 @@ public class AbstractRestTest {
         return item;
     }
 
-    protected <T extends RmObject> void validateLocationHeader(
+    protected <T> void validateLocationHeader(
             Class<T> objectClass,
             URI location,
             String folderStringToCheck,

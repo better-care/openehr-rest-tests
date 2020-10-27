@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrConstants;
@@ -27,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     private String compositionWrongType;
     private DateTime before;
 
-    @PostConstruct
+    @BeforeAll
     @Override
     public void setUp() throws IOException {
         super.setUp();
@@ -570,5 +570,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         assertThat(body1).isNotNull();
         assertThat(body1.getData()).isNull();
         assertThat(body1.getLifecycleState().getValue()).isEqualTo(VersionLifecycleState.DELETED.value());
+
+        compositionUid2 = postComposition(ehrId, compositionUpdated);
     }
 }

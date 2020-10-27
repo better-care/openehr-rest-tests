@@ -4,6 +4,7 @@ import care.better.platform.model.Ehr;
 import care.better.platform.model.EhrStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrConformance;
@@ -27,14 +28,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.*;
@@ -48,7 +50,6 @@ import static org.springframework.http.HttpStatus.*;
 @TestPropertySource(value = "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {WebClientConfiguration.class})
 public class OpenEhrQueryRestTest extends AbstractRestTest {
-    private static final String PARTY_REF_UID = UUID.randomUUID().toString();
 
     @Autowired
     private OpenEhrConformance conformance;
@@ -65,8 +66,11 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     private String groupTwoName;
     private String ehrQueryForSingleEhrName;
     private String compositionQueryForSingleEhrName;
+    private String testQuery1, testQuery2, testQuery3, testQuery4, testQuery5;
+    private final List<String> allQueryNames = new ArrayList<>();
 
     @Override
+    @BeforeAll
     public void setUp() throws IOException {
         super.setUp();
         EhrStatus ehrStatus = new EhrStatus();
@@ -108,12 +112,17 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         ehrQueryForSingleEhr = "SELECT DISTINCT e/ehr_id/value FROM EHR e";
         compositionQueryForSingleEhr = "SELECT DISTINCT e/ehr_id/value FROM EHR e CONTAINS COMPOSITION c";
 
-        tempLargerThanName = "tempLargerThan" + randomNum;
-        maxTempName = "maxTemp" + randomNum;
-        groupOneName = "group::one" + randomNum;
-        groupTwoName = "group::two" + randomNum;
-        ehrQueryForSingleEhrName = "ehrQueryForSingleEhr" + randomNum;
-        compositionQueryForSingleEhrName = "compositionQueryForSingleEhr" + randomNum;
+        tempLargerThanName = setQueryName("tempLargerThan");
+        maxTempName = setQueryName("maxTemp");
+        groupOneName = setQueryName("group::one");
+        groupTwoName = setQueryName("group::two");
+        ehrQueryForSingleEhrName = setQueryName("ehrQueryForSingleEhr");
+        compositionQueryForSingleEhrName = setQueryName("compositionQueryForSingleEhr");
+        testQuery1 = setQueryName("test1");
+        testQuery2 = setQueryName("test2");
+        testQuery3 = setQueryName("test3");
+        testQuery4 = setQueryName("test4");
+        testQuery5 = setQueryName("test5");
         uploadNamedQuery("named parameter query", tempLargerThanName, namedParameterQuery);
         uploadNamedQuery("max temp query", maxTempName, maxTempQuery);
         uploadNamedQuery("named parameter query 1", groupOneName, namedParameterQuery);
@@ -122,18 +131,11 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         uploadNamedQuery("composition query for single ehr", compositionQueryForSingleEhrName, this.compositionQueryForSingleEhr);
     }
 
-    private void uploadNamedQuery(String description, String name, String query) {
-        OpenEhrViewRequest request = new OpenEhrViewRequest();
-        request.setDescription(description);
-        request.setQ(query);
-        ResponseEntity<OpenEhrViewResponse> tempLargerThanResponse = exchange(
-                getTargetPath() + "/definition/query/{qualified-query-name}",
-                PUT,
-                request,
-                OpenEhrViewResponse.class,
-                fullRepresentationHeaders(),
-                name);
-        assertThat(tempLargerThanResponse.getStatusCode()).isEqualTo(OK);
+    @PreDestroy
+    public void destroy() {
+      for (String queryName : allQueryNames) {
+          deleteQuery(queryName);
+      }
     }
 
     @Test
@@ -145,7 +147,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body).isNotNull();
         assertThat(body.getRows()).isNull();
 
-        ResponseEntity<OpenEhrQueryResponse> response2 = getResponse(getTargetPath() + "query/aql?q=" + query, OpenEhrQueryResponse.class);
+        ResponseEntity<OpenEhrQueryResponse> response2 = getResponse(getTargetPath() + "/query/aql?q=" + query, OpenEhrQueryResponse.class);
         assertThat(response2.getStatusCode()).isEqualTo(OK);
         OpenEhrQueryResponse body2 = response2.getBody();
         assertThat(body2).isNotNull();
@@ -161,7 +163,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body2.getRows().get(1).get(0)).isEqualTo(37.2d);
         assertThat(body2.getRows().get(1).get(1)).isEqualTo("°C");
 
-        ResponseEntity<OpenEhrQueryResponse> response3 = getResponse(getTargetPath() + "query/aql?q=" + query + "&offset=1", OpenEhrQueryResponse.class);
+        ResponseEntity<OpenEhrQueryResponse> response3 = getResponse(getTargetPath() + "/query/aql?q=" + query + "&offset=1", OpenEhrQueryResponse.class);
         assertThat(response3.getStatusCode()).isEqualTo(OK);
         OpenEhrQueryResponse body3 = response3.getBody();
         assertThat(body3).isNotNull();
@@ -171,7 +173,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body3.getRows().get(0).get(0)).isEqualTo(37.2d);
         assertThat(body3.getRows().get(0).get(1)).isEqualTo("°C");
 
-        ResponseEntity<OpenEhrQueryResponse> response4 = getResponse(getTargetPath() + "query/aql?q=" + query + "&fetch=1", OpenEhrQueryResponse.class);
+        ResponseEntity<OpenEhrQueryResponse> response4 = getResponse(getTargetPath() + "/query/aql?q=" + query + "&fetch=1", OpenEhrQueryResponse.class);
         assertThat(response4.getStatusCode()).isEqualTo(OK);
         OpenEhrQueryResponse body4 = response4.getBody();
         assertThat(body4).isNotNull();
@@ -215,7 +217,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         OpenEhrQueryResponse body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getRows()).hasSize(1);
+        assertThat(body.getRows()).hasSizeGreaterThan(0);
     }
 
     @Test
@@ -325,7 +327,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         OpenEhrQueryResponse body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getRows()).hasSize(1);
+        assertThat(body.getRows()).hasSizeGreaterThan(0);
     }
 
     @Test
@@ -594,7 +596,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         OpenEhrQueryResponse body = getBody(response);
         assertThat(body).isNotNull();
-        assertThat(body.getRows()).hasSize(1);
+        assertThat(body.getRows()).hasSizeGreaterThan(0);
     }
 
     @Test
@@ -655,35 +657,10 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(response2.getStatusCode()).isEqualTo(OK);
         OpenEhrViewResponse[] body2 = response2.getBody();
         assertThat(body2).isNotNull();
-        assertThat(body2.length).isEqualTo(6);
-        assertThat(body2[1].getName()).isEqualTo(tempLargerThanName);
-        assertThat(body2[1].getType()).isEqualTo("aql");
-        assertThat(body2[1].getQ()).isEqualTo(namedParameterQuery);
-    }
-
-    @Test
-    public void searchQualifiedQueryDefinitionByGroup() {
-
-        ResponseEntity<OpenEhrViewResponse[]> response = getResponse(
-                getTargetPath() + "/definition/query/{qualified_query_name}", OpenEhrViewResponse[].class, maxTempName);
-        assertThat(response.getStatusCode()).isEqualTo(OK);
-        OpenEhrViewResponse[] body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.length).isEqualTo(1);
-
-        OpenEhrViewResponse viewResponse = body[0];
-        assertThat(viewResponse.getName()).isEqualTo(maxTempName);
-        assertThat(viewResponse.getType()).isEqualTo("aql");
-        assertThat(viewResponse.getQ()).isEqualTo(maxTempQuery);
-
-        ResponseEntity<OpenEhrViewResponse[]> response2 = getResponse(getTargetPath() + "/definition/query", OpenEhrViewResponse[].class);
-        assertThat(response2.getStatusCode()).isEqualTo(OK);
-        OpenEhrViewResponse[] body2 = response2.getBody();
-        assertThat(body2).isNotNull();
-        assertThat(body2.length).isEqualTo(6);
-        assertThat(body2[1].getName()).isEqualTo(tempLargerThanName);
-        assertThat(body2[1].getType()).isEqualTo("aql");
-        assertThat(body2[1].getQ()).isEqualTo(namedParameterQuery);
+        assertThat(body2).hasSizeGreaterThan(5);
+        assertThat(body2[0].getName()).isEqualTo(tempLargerThanName);
+        assertThat(body2[0].getType()).isEqualTo("aql");
+        assertThat(body2[0].getQ()).isEqualTo(namedParameterQuery);
     }
 
     @Test
@@ -724,20 +701,20 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     public void setQualifiedQueryDefinition() {
 
         OpenEhrViewRequest view = new OpenEhrViewRequest();
-        view.setDescription("test");
+        view.setDescription(testQuery1);
         view.setQ(query);
         ResponseEntity<OpenEhrViewResponse> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}",
                                                                 PUT,
                                                                 view,
                                                                 OpenEhrViewResponse.class,
                                                                 null,
-                                                                "test");
+                                                                testQuery1);
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response, true, true);
         assertThat(response.getBody()).isNull();
 
         ResponseEntity<OpenEhrViewResponse[]> response1 = getResponse(
-                getTargetPath() + "/definition/query/{qualified_query_name}", OpenEhrViewResponse[].class, "test");
+                getTargetPath() + "/definition/query/{qualified_query_name}", OpenEhrViewResponse[].class, testQuery1);
         assertThat(response1.getStatusCode()).isEqualTo(OK);
 
         OpenEhrViewResponse[] body1 = response1.getBody();
@@ -746,7 +723,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
 
         OpenEhrViewResponse viewResponse1 = body1[0];
         assertThat(viewResponse1).isNotNull();
-        assertThat(viewResponse1.getName()).isEqualTo("test");
+        assertThat(viewResponse1.getName()).isEqualTo(testQuery1);
         assertThat(viewResponse1.getType()).isEqualTo("aql");
         assertThat(viewResponse1.getQ()).isEqualTo(query);
     }
@@ -755,7 +732,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     public void setQualifiedQueryDefinitionPreferRepresentation() {
 
         OpenEhrViewRequest view = new OpenEhrViewRequest();
-        view.setDescription("test");
+        view.setDescription(testQuery2);
         view.setQ(query);
 
         ResponseEntity<OpenEhrViewResponse> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}",
@@ -763,14 +740,14 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
                                                                 view,
                                                                 OpenEhrViewResponse.class,
                                                                 fullRepresentationHeaders(),
-                                                                "test");
+                                                                testQuery2);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response, true, true);
         OpenEhrViewResponse viewResponse = response.getBody();
 
         assertThat(viewResponse).isNotNull();
-        assertThat(viewResponse.getName()).isEqualTo("test");
+        assertThat(viewResponse.getName()).isEqualTo(testQuery2);
         assertThat(viewResponse.getType()).isEqualTo("aql");
         assertThat(viewResponse.getQ()).isEqualTo(query);
     }
@@ -779,14 +756,14 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     public void setQualifiedQueryDefinitionWithAqlType() {
 
         OpenEhrViewRequest view = new OpenEhrViewRequest();
-        view.setDescription("test");
+        view.setDescription(testQuery3);
         view.setQ(query);
         ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}?type={type}",
                                                      PUT,
                                                      view,
                                                      JsonNode.class,
                                                      null,
-                                                     "test",
+                                                     testQuery3,
                                                      "AQL");
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
     }
@@ -795,14 +772,14 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     public void setQualifiedQueryDefinitionWithUnsupportedType() {
 
         OpenEhrViewRequest view = new OpenEhrViewRequest();
-        view.setDescription("test");
+        view.setDescription(testQuery4);
         view.setQ(query);
         ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}?type={type}",
                                                      PUT,
                                                      view,
                                                      JsonNode.class,
                                                      null,
-                                                     "test",
+                                                     testQuery4,
                                                      "UnsupportedType");
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
@@ -811,28 +788,27 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     public void setQualifiedQueryVersionedDefinition() {
 
         OpenEhrViewRequest view = new OpenEhrViewRequest();
-        view.setDescription("test");
+        view.setDescription(testQuery5);
         view.setQ(query);
         ResponseEntity<OpenEhrViewResponse> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}/2.0.0",
                                                                 PUT,
                                                                 view,
                                                                 OpenEhrViewResponse.class,
                                                                 null,
-                                                                "test");
+                                                                testQuery5);
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response, true, true);
         assertThat(response.getBody()).isNull();
 
         // versioning is unsupported
         ResponseEntity<JsonNode> response1 = getResponse(
-                getTargetPath() + "/definition/query/{qualified_query_name}/2.0.0", JsonNode.class, "test");
+                getTargetPath() + "/definition/query/{qualified_query_name}/2.0.0", JsonNode.class, testQuery5);
         assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
 
     }
 
     @Test
     public void getConformance() {
-
         ResponseEntity<OpenEhrConformance> response = exchange(getTargetPath(), OPTIONS, null, OpenEhrConformance.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         OpenEhrConformance body = response.getBody();
@@ -844,4 +820,28 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body.getVendor()).isEqualTo(conformance.getVendor());
         assertThat(body.getEndpoints()).isEqualTo(conformance.getEndpoints());
     }
+
+    private void uploadNamedQuery(String description, String name, String query) {
+        OpenEhrViewRequest request = new OpenEhrViewRequest();
+        request.setDescription(description);
+        request.setQ(query);
+        ResponseEntity<OpenEhrViewResponse> response = exchange(
+                getTargetPath() + "/definition/query/{qualified-query-name}",
+                PUT,
+                request,
+                OpenEhrViewResponse.class,
+                null,
+                name);
+        assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
+    }
+
+    private void deleteQuery(String queryName) {
+       //todo missing in spec https://specifications.openehr.org/releases/ITS-REST/latest/definitions.html
+    }
+
+    private String setQueryName(String queryName) {
+        allQueryNames.add(queryName);
+        return queryName;
+    }
+
 }

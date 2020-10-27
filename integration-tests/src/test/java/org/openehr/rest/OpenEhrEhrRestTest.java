@@ -28,7 +28,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -562,7 +561,8 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void retrieveEhrStatusVersion() {
+    public void retrieveEhrStatusVersion() throws IOException {
+        super.setUp();
 
         ResponseEntity<EhrStatus> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
                                                           EhrStatus.class,

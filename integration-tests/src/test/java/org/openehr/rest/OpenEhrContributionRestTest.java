@@ -4,9 +4,10 @@ import care.better.platform.locatable.LocatableUid;
 import care.better.platform.model.EhrStatus;
 import care.better.platform.service.AuditChangeType;
 import care.better.platform.util.ConversionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrContributionAudit;
 import org.openehr.data.OpenEhrContributionRequest;
@@ -42,14 +43,21 @@ import static org.springframework.http.HttpStatus.*;
 /**
  * @author Dusan Markovic
  */
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class})
 @TestPropertySource(value = "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {WebClientConfiguration.class})
 public class OpenEhrContributionRestTest extends AbstractRestTest {
 
+    @BeforeEach
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+    }
+
     @Test
-    public void createContribution() throws IOException {
+    public void createContribution() {
 
         HttpHeaders headers = fullRepresentationHeaders();
         // 200
@@ -77,8 +85,7 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void createContributionResolveRefs() throws IOException {
-
+    public void createContributionResolveRefs() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Prefer", "return=representation, resolve_refs");
         // 200
@@ -102,7 +109,7 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void createContribution400() throws IOException {
+    public void createContribution400() {
         HttpHeaders headers = fullRepresentationHeaders();
 
         // 400 - EhrStatus can't be created or deleted
@@ -158,7 +165,7 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void createContribution404() throws IOException {
+    public void createContribution404() {
         OpenEhrContributionRequest request = createRequestData(
                 CREATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
         ResponseEntity<OpenEhrErrorResponse> response = exchange(
@@ -179,7 +186,7 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void retrieveContribution() throws IOException {
+    public void retrieveContribution() {
         HttpHeaders headers = fullRepresentationHeaders();
 
         OpenEhrContributionRequest request = createRequestData(
@@ -216,7 +223,7 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
             AuditChangeType ehrStatusAuditChangeType,
             String outerCommiterName,
             String compositionCommiterName,
-            String folderCommiterName) throws JsonProcessingException {
+            String folderCommiterName) {
         return this.createRequestData(
                 compositionAuditChangeType, folderAuditChangeType, ehrStatusAuditChangeType, outerCommiterName, compositionCommiterName, folderCommiterName,
                 composition);

@@ -14,6 +14,7 @@ public class OpenEhrViewResponse implements Serializable {
 
     private String name;
     private String type;
+    private String version;
     private OffsetDateTime saved;
     private String q;
 
@@ -33,6 +34,15 @@ public class OpenEhrViewResponse implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @XmlElement
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @XmlElement

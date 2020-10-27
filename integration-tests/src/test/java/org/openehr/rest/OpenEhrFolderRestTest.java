@@ -4,6 +4,7 @@ import care.better.platform.locatable.LocatableUid;
 import care.better.platform.util.ConversionUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.joda.time.DateTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrErrorResponse;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +34,13 @@ import static org.springframework.http.HttpStatus.*;
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class})
 @TestPropertySource(value = "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {WebClientConfiguration.class})
-public class OpenEhrDirectoryRestTest extends AbstractRestTest {
+public class OpenEhrFolderRestTest extends AbstractRestTest {
+
+    @BeforeEach
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+    }
 
     @Test
     public void createFolder() {
