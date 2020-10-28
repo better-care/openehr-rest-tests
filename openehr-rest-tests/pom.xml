@@ -11,46 +11,47 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>org.example</groupId>
-    <artifactId>integration-tests</artifactId>
+    <groupId>care.better.platform.test</groupId>
+    <artifactId>openehr-rest-tests</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>spring-web-test-client</name>
-    <description>Test OpenEHR Endpoints using WebTestClient</description>
+    <description>Test OpenEHR Endpoints</description>
 
     <properties>
         <java.version>11</java.version>
+        <better-apis.version>3.1.0-A1</better-apis.version>
+        <commons-io.version>2.6</commons-io.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>care.better.platform</groupId>
             <artifactId>api</artifactId>
-            <version>3.1.0-A1</version>
+            <version>${better-apis.version}</version>
         </dependency>
         <dependency>
             <groupId>care.better.platform</groupId>
             <artifactId>model</artifactId>
-            <version>3.1.0-A1</version>
+            <version>${better-apis.version}</version>
         </dependency>
         <dependency>
             <groupId>care.better.platform</groupId>
             <artifactId>json</artifactId>
-            <version>3.1.0-A1</version>
+            <version>${better-apis.version}</version>
         </dependency>
         <dependency>
             <groupId>care.better.platform</groupId>
             <artifactId>templates-api</artifactId>
-            <version>3.1.0-A1</version>
+            <version>${better-apis.version}</version>
         </dependency>
         <dependency>
             <groupId>care.better.platform</groupId>
             <artifactId>jaxb</artifactId>
-            <version>3.1.0-A1</version>
+            <version>${better-apis.version}</version>
         </dependency>
         <dependency>
             <groupId>care.better.platform</groupId>
             <artifactId>common</artifactId>
-            <version>3.1.0-A1</version>
+            <version>${better-apis.version}</version>
         </dependency>
         <!-- jaxb -->
         <dependency>
@@ -75,7 +76,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
+            <version>${commons-io.version}</version>
         </dependency>
 
         <dependency>
@@ -130,7 +131,26 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
             </plugin>
         </plugins>
     </build>

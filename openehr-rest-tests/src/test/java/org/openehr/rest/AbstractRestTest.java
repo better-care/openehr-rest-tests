@@ -8,7 +8,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
-import org.openehr.jaxb.am.Template;
 import org.openehr.jaxb.rm.Composition;
 import org.openehr.jaxb.rm.Folder;
 import org.openehr.jaxb.rm.ObjectRef;
@@ -43,10 +42,10 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.openehr.data.OpenEhrConstants.POST_COMPOSITION_PATH;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.springframework.http.MediaType.*;
 
 /**
  * @author Dusan Markovic
@@ -77,12 +76,14 @@ public class AbstractRestTest {
     public void setUp() throws IOException {
         targetPath = uri.toURL().toString();
         nonExistingUid = UUID.randomUUID() + "::domain3::1";
-        ResponseEntity<Ehr> ehrResponseEntity = exchange(getTargetPath() + "/ehr", POST, null, Ehr.class, fullRepresentationHeaders());
+        HttpHeaders headers = fullRepresentationHeaders();
+        ResponseEntity<Ehr> ehrResponseEntity = exchange(getTargetPath() + "/ehr", POST, null, Ehr.class, headers);
         ehrId = Objects.requireNonNull(ehrResponseEntity.getBody()).getEhrId().getValue();
 
+        uploadTemplate("/rest/Demo Vitals.opt");
         composition = objectMapper.readValue(IOUtils.toString(
-                        OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/composition.json"),
-                        StandardCharsets.UTF_8).replace("{{REPLACE_THIS}}", "Jane Nurse"), Composition.class);
+                OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/composition.json"),
+                StandardCharsets.UTF_8).replace("{{REPLACE_THIS}}", "Jane Nurse"), Composition.class);
         assertThat(composition).isNotNull();
         assertThat(composition.getUid()).isNull();
         compositionUid = postComposition(ehrId, composition);
@@ -280,6 +281,8 @@ public class AbstractRestTest {
     protected HttpHeaders fullRepresentationHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Prefer", "return=representation");
+        headers.set(ACCEPT, APPLICATION_JSON_VALUE);
+        headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE);
         return headers;
     }
 
@@ -352,11 +355,10 @@ public class AbstractRestTest {
         String templateString = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream(templatePath),
                 StandardCharsets.UTF_8);
-        HttpHeaders headers = fullRepresentationHeaders();
+        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_XML);
         headers.setAccept(Collections.singletonList(APPLICATION_XML));
-        ResponseEntity<Template> templateResponseEntity = exchange(
-                getTargetPath() + "/definition/template/adl1.4", POST, templateString, Template.class, headers);
-        assertThat(templateResponseEntity.getStatusCode()).isEqualTo(CREATED);
+        ResponseEntity<String> templateResponseEntity = exchange(
+                getTargetPath() + "/definition/template/adl1.4", POST, templateString, String.class, headers);
     }
 }

@@ -51,15 +51,15 @@ import static org.springframework.http.HttpStatus.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {WebClientConfiguration.class})
 public class OpenEhrQueryRestTest extends AbstractRestTest {
 
+    private final List<String> allQueryNames = new ArrayList<>();
+    protected String ehrId1;
     @Autowired
     private OpenEhrConformance conformance;
-
     private String query;
     private String namedParameterQuery;
     private String maxTempQuery;
     private String ehrQueryForSingleEhr;
     private String compositionQueryForSingleEhr;
-    protected String ehrId1;
     private String tempLargerThanName;
     private String maxTempName;
     private String groupOneName;
@@ -67,7 +67,6 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     private String ehrQueryForSingleEhrName;
     private String compositionQueryForSingleEhrName;
     private String testQuery1, testQuery2, testQuery3, testQuery4, testQuery5;
-    private final List<String> allQueryNames = new ArrayList<>();
 
     @Override
     @BeforeAll
@@ -133,9 +132,9 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
 
     @PreDestroy
     public void destroy() {
-      for (String queryName : allQueryNames) {
-          deleteQuery(queryName);
-      }
+        for (String queryName : allQueryNames) {
+            deleteQuery(queryName);
+        }
     }
 
     @Test
@@ -836,7 +835,7 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
     }
 
     private void deleteQuery(String queryName) {
-       //todo missing in spec https://specifications.openehr.org/releases/ITS-REST/latest/definitions.html
+        //todo missing in spec https://specifications.openehr.org/releases/ITS-REST/latest/definitions.html
     }
 
     private String setQueryName(String queryName) {

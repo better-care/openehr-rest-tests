@@ -1,4 +1,4 @@
-package org.openehr.rest;
+package org.openehr.rest.auth;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.AuthCache;

@@ -59,7 +59,12 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
 
     @Test
     public void createFolder400() {
-        ResponseEntity<OpenEhrErrorResponse> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, null, OpenEhrErrorResponse.class, null, ehrId);
+        ResponseEntity<OpenEhrErrorResponse> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
+                                                                 POST,
+                                                                 null,
+                                                                 OpenEhrErrorResponse.class,
+                                                                 null,
+                                                                 ehrId);
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
     }
@@ -339,7 +344,12 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         // delete directory
         HttpHeaders deleteDirectoryHeaders = new HttpHeaders();
         deleteDirectoryHeaders.set(IF_MATCH, uid);
-        ResponseEntity<String> deletedResponse = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", DELETE, null, String.class, deleteDirectoryHeaders, ehrId);
+        ResponseEntity<String> deletedResponse = exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
+                                                          DELETE,
+                                                          null,
+                                                          String.class,
+                                                          deleteDirectoryHeaders,
+                                                          ehrId);
         assertThat(deletedResponse.getStatusCode()).isEqualTo(NO_CONTENT);
 
         // retrieve deleted directory
@@ -348,9 +358,9 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
 
         // retrieve non-existing directory in the past while the last one has been deleted
         ResponseEntity<JsonNode> notFoundResponse1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
-                                       JsonNode.class,
-                                       ehrId,
-                                       DATE_TIME_FORMATTER.print(atTheBeginning));
+                                                                 JsonNode.class,
+                                                                 ehrId,
+                                                                 DATE_TIME_FORMATTER.print(atTheBeginning));
         assertThat(notFoundResponse1.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
