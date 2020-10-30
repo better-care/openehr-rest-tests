@@ -32,7 +32,6 @@ nbdist/
 ### NPM ###
 node_modules/
 
-*.properties
 log4j2.xml
 /logs/
 /*/logs

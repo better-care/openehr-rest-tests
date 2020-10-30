@@ -2,6 +2,7 @@ package org.openehr.rest;
 
 import care.better.platform.locatable.LocatableUid;
 import care.better.platform.model.Ehr;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.format.DateTimeFormatter;
@@ -15,21 +16,28 @@ import org.openehr.jaxb.rm.ObjectVersionId;
 import org.openehr.rest.conf.WebClientConfiguration;
 import org.openehr.utils.FolderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,7 +68,9 @@ public class AbstractRestTest {
     protected ObjectMapper objectMapper;
 
     @Autowired
+    @Qualifier("restTemplate")
     protected RestTemplate restTemplate;
+
     @Value("${openehr.rest.uri}")
     protected URI uri;
 
@@ -238,16 +248,33 @@ public class AbstractRestTest {
         validateLocationAndETag(response, true, true);
     }
 
-    protected void validateLocationAndETag(ResponseEntity<?> response, boolean etagAndLastModified, boolean location) {
-        URI locationUri = response.getHeaders().getLocation();
-        if (location) {
+    protected void validateLocationAndETag(HttpStatusCodeException exception) {
+        validateLocationAndETag(exception, true, true);
+    }
+
+    protected void validateLocationAndETag(ResponseEntity<?> response, boolean etagAndLastModifiedAllowed, boolean locationAllowed) {
+        validateLocationAndETag(response.getHeaders(), response.getStatusCode(), etagAndLastModifiedAllowed, locationAllowed);
+    }
+
+    protected void validateLocationAndETag(HttpStatusCodeException exception, boolean etagAndLastModifiedAllowed, boolean locationAllowed) {
+        validateLocationAndETag(Objects.requireNonNull(exception.getResponseHeaders()), exception.getStatusCode(), etagAndLastModifiedAllowed, locationAllowed);
+    }
+
+    protected void validateLocationAndETag(HttpHeaders headers, HttpStatus statusCode, boolean etagAndLastModifiedAllowed, boolean locationAllowed) {
+        URI locationUri = headers.getLocation();
+        if (locationAllowed) {
             assertThat(locationUri).isNotNull();
-            assertThat(locationUri.toString()).startsWith(getTargetPath());
             String decodedUrl;
             try {
+                URI targetPathURI = new URI(getTargetPath());
+                assertThat(locationUri.getPort()).isEqualTo(targetPathURI.getPort());
+                assertThat(locationUri.getPath()).startsWith(targetPathURI.getPath());
+                InetAddress targetPathInetAddress = InetAddress.getByName(targetPathURI.getHost());
+                InetAddress locationInetAddress = InetAddress.getByName(locationUri.getHost());
+                assertThat(targetPathInetAddress).isEqualTo(locationInetAddress);
                 decodedUrl = URLDecoder.decode(locationUri.toString(), StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Unable to decode url: " + locationUri);
+            } catch (UnsupportedEncodingException | URISyntaxException | UnknownHostException e) {
+                throw new RuntimeException(e);
             }
             ResponseEntity<String> r = getResponse(decodedUrl, String.class, MediaType.ALL);
             assertThat(r).isNotNull();
@@ -259,18 +286,18 @@ public class AbstractRestTest {
                 throw new RuntimeException("Unable to validate location header: " + locationUri + " Response: " + r.toString());
             }
         } else {
-            assertThat(locationUri).isNull();
+            assertThat(locationUri).withFailMessage("Location header '%s' should not be present!", locationUri).isNull();
         }
-        String eTagString = response.getHeaders().getETag();
-        if (etagAndLastModified) {
+        String eTagString = headers.getETag();
+        if (etagAndLastModifiedAllowed) {
             assertThat(eTagString).isNotNull();
             assertThat(eTagString).startsWith("\"");
             assertThat(eTagString).endsWith("\"");
-            long lastModified = response.getHeaders().getLastModified();
-            if (response.getStatusCode().is2xxSuccessful()) {
+            long lastModified = headers.getLastModified();
+            if (statusCode.is2xxSuccessful()) {
                 assertThat(lastModified).isGreaterThan(0L);
             }
-            if (location) {
+            if (locationAllowed) {
                 assertThat(locationUri.toString()).endsWith(eTagString.substring(1, eTagString.length() - 1));
             }
         } else {
@@ -321,10 +348,10 @@ public class AbstractRestTest {
     }
 
     protected String postComposition(String ehrId, Composition medikationLoopComposition) {
-        ResponseEntity<Composition> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, medikationLoopComposition, Composition.class, fullRepresentationHeaders(), ehrId);
+        ResponseEntity<JsonNode> response = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, medikationLoopComposition, JsonNode.class, fullRepresentationHeaders(), ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        return Objects.requireNonNull(response.getBody()).getUid().getValue();
+        return Objects.requireNonNull(response.getBody().get("uid").get("value").asText());
     }
 
     protected void setCompositionUid(@javax.annotation.Nullable Composition composition, LocatableUid compositionUid) {
@@ -358,7 +385,13 @@ public class AbstractRestTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_XML);
         headers.setAccept(Collections.singletonList(APPLICATION_XML));
-        ResponseEntity<String> templateResponseEntity = exchange(
-                getTargetPath() + "/definition/template/adl1.4", POST, templateString, String.class, headers);
+        try {
+            ResponseEntity<String> templateResponseEntity = exchange(
+                    getTargetPath() + "/definition/template/adl1.4", POST, templateString, String.class, headers);
+        } catch (HttpClientErrorException e) {
+            if (e.getRawStatusCode() != 409) {
+                throw e;
+            }
+        }
     }
 }

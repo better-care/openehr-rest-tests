@@ -1,6 +1,5 @@
 package org.openehr.rest.conf;
 
-import org.openehr.rest.auth.NoopResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,7 @@ import static org.openehr.rest.auth.AuthUtils.createRestTemplate;
 public class BasicAuthConfiguration {
 
     @Bean
-    public RestTemplate restTemplateBasicAuth(
+    public RestTemplate restTemplate(
             @Value("${openehr.rest.uri}") URI uri,
             @Value("${auth.basic.username}") String username,
             @Value("${auth.basic.password}") String password,
@@ -34,7 +33,7 @@ public class BasicAuthConfiguration {
             ByteArrayHttpMessageConverter byteArrayHttpMessageConverter,
             MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
         return createRestTemplate(
-                uri, username, password, new NoopResponseErrorHandler(),
+                uri, username, password, null,
                 stringHttpMessageConverter, jaxb2MessageConverter, byteArrayHttpMessageConverter, mappingJackson2HttpMessageConverter);
     }
 }

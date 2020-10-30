@@ -24,7 +24,7 @@ import java.net.URI;
 public class NoAuthConfiguration {
 
     @Bean
-    public RestTemplate restTemplateBasicAuth(
+    public RestTemplate restTemplate(
             @Value("${openehr.rest.uri}") URI uri,
             StringHttpMessageConverter stringHttpMessageConverter,
             Jaxb2RootElementHttpMessageConverter jaxb2MessageConverter,
@@ -34,6 +34,4 @@ public class NoAuthConfiguration {
                 uri, null, null, new NoopResponseErrorHandler(),
                 stringHttpMessageConverter, jaxb2MessageConverter, byteArrayHttpMessageConverter, mappingJackson2HttpMessageConverter);
     }
-
-
 }
