@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2020 Better d.o.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package org.openehr.rest;
 
 import care.better.platform.locatable.LocatableUid;
@@ -214,13 +228,13 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         // 404 folder_uid not found
         HttpStatusCodeException httpException = assertThrows(
                 HttpStatusCodeException.class,
-                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, ehrId, "blablabla"));
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", String.class, ehrId, "blablabla"));
         assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 ehr_id not found
         HttpStatusCodeException httpException1 = assertThrows(
                 HttpStatusCodeException.class,
-                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, "blablabla", uid));
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", String.class, "blablabla", uid));
         assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
@@ -343,7 +357,7 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
                 HttpStatusCodeException.class,
                 () -> getResponse(
                         getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
-                        JsonNode.class,
+                        String.class,
                         ehrId,
                         DATE_TIME_FORMATTER.print(before),
                         "someNonexistantFolderName"));
@@ -353,7 +367,7 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
                 HttpStatusCodeException.class,
                 () -> getResponse(
                         getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
-                        JsonNode.class,
+                        String.class,
                         ehrId,
                         DATE_TIME_FORMATTER.print(before.minusDays(1)),
                         subFolderName));
@@ -378,7 +392,7 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         HttpStatusCodeException httpException3 = assertThrows(
                 HttpStatusCodeException.class,
                 () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
-                                  JsonNode.class,
+                                  String.class,
                                   ehrId,
                                   DATE_TIME_FORMATTER.print(atTheBeginning)));
         assertThat(httpException3.getStatusCode()).isEqualTo(NOT_FOUND);
