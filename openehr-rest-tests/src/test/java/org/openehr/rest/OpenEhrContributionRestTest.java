@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static care.better.platform.service.AuditChangeType.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.*;
 
@@ -114,75 +116,90 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
 
         // 400 - EhrStatus can't be created or deleted
         OpenEhrContributionRequest request = createRequestData(CREATION, CREATION, CREATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        ResponseEntity<OpenEhrErrorResponse> response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution",
-                                                                 POST,
-                                                                 request,
-                                                                 OpenEhrErrorResponse.class,
-                                                                 headers,
-                                                                 ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        request = createRequestData(CREATION, CREATION, DELETED, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException.getResponseBodyAsString()).isNotEmpty();
+
+        OpenEhrContributionRequest request1 = createRequestData(CREATION, CREATION, DELETED, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request1, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException1.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException1.getResponseBodyAsString()).isNotEmpty();
 
         // 400 - nonexisting EhrStatus can't be modified
-        request = createRequestData(CREATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        Optional<OpenEhrContributionVersion> ehrStatusVersion = request.getVersions().stream().filter(v -> v.getData() instanceof EhrStatus).findFirst();
+        OpenEhrContributionRequest request2 = createRequestData(CREATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
+        Optional<OpenEhrContributionVersion> ehrStatusVersion = request2.getVersions().stream().filter(v -> v.getData() instanceof EhrStatus).findFirst();
         ehrStatusVersion.ifPresent(es -> {
             HierObjectId hierObjectId = new HierObjectId();
             hierObjectId.setValue(nonExistingUid);
             ((EhrStatus)es.getData()).setUid(hierObjectId);
         });
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request2, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException2.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException2.getResponseBodyAsString()).isNotEmpty();
 
         // 400 - nonexisting Folder can't be deleted or modified
-        request = createRequestData(CREATION, DELETED, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        request = createRequestData(CREATION, MODIFICATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
+        OpenEhrContributionRequest request3 = createRequestData(CREATION, DELETED, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
+        HttpStatusCodeException httpException3 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request3, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException3.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException3.getResponseBodyAsString()).isNotEmpty();
+
+        OpenEhrContributionRequest request4 = createRequestData(CREATION, MODIFICATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
+        HttpStatusCodeException httpException4 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request4, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException4.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException4.getResponseBodyAsString()).isNotEmpty();
 
         // 400 - nonexisting Composition can't be deleted or modified
-        request = createRequestData(DELETED, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        ehrStatusVersion = request.getVersions().stream().filter(v -> v.getData() instanceof Composition).findFirst();
+        OpenEhrContributionRequest request5 = createRequestData(DELETED, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
+        ehrStatusVersion = request5.getVersions().stream().filter(v -> v.getData() instanceof Composition).findFirst();
         ehrStatusVersion.ifPresent(c -> setCompositionUid((Composition)c.getData(), new LocatableUid(nonExistingUid)));
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        request = createRequestData(MODIFICATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        ehrStatusVersion = request.getVersions().stream().filter(v -> v.getData() instanceof Composition).findFirst();
+        HttpStatusCodeException httpException5 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request5, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException5.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException5.getResponseBodyAsString()).isNotEmpty();
+
+        OpenEhrContributionRequest request6 = createRequestData(MODIFICATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
+        ehrStatusVersion = request6.getVersions().stream().filter(v -> v.getData() instanceof Composition).findFirst();
         ehrStatusVersion.ifPresent(c -> setCompositionUid((Composition)c.getData(), new LocatableUid(nonExistingUid)));
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
+        HttpStatusCodeException httpException6 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request6, OpenEhrErrorResponse.class, headers, ehrId));
+        assertThat(httpException6.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException6.getResponseBodyAsString()).isNotEmpty();
     }
 
     @Test
     public void createContribution404() {
         OpenEhrContributionRequest request = createRequestData(
                 CREATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez");
-        ResponseEntity<OpenEhrErrorResponse> response = exchange(
-                getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, fullRepresentationHeaders(), "blablabla");
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(
+                        getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, OpenEhrErrorResponse.class, fullRepresentationHeaders(), "blablabla"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
     public void createContributionFailedValidation() {
         OpenEhrContributionRequest request = createRequestData(
                 CREATION, CREATION, MODIFICATION, "JanezBananez", "NotJanezBananez", "NotNotJanezBananez", unProcessableComposition);
-        ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, JsonNode.class, fullRepresentationHeaders(), ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        JsonNode body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.get("message").asText()).isEqualTo("Composition validation failed (there are missing or invalid values).");
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/contribution", POST, request, String.class, fullRepresentationHeaders(), ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        String body = httpException.getResponseBodyAsString();
+        assertThat(body).isNotEmpty();
+        assertThat(body).contains("validation failed");
     }
 
     @Test
@@ -206,15 +223,17 @@ public class OpenEhrContributionRestTest extends AbstractRestTest {
         assertThat(contribution1.getUid().getValue()).isEqualTo(contributionUid);
 
         // 404 nonexistant ehrUid or contributionUid
-        ResponseEntity<JsonNode> notFoundResponse = getResponse(getTargetPath() + "/ehr/{ehr_id}/contribution/{contribution_uid}",
-                                                                JsonNode.class,
-                                                                "blablabla",
-                                                                contributionUid);
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(notFoundResponse, false, false);
-        notFoundResponse = getResponse(getTargetPath() + "/ehr/{ehr_id}/contribution/{contribution_uid}", JsonNode.class, ehrId, nonExistingUid);
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(notFoundResponse, false, false);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/contribution/{contribution_uid}", String.class, "blablabla", contributionUid));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException, false, false);
+
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/contribution/{contribution_uid}", String.class, ehrId, nonExistingUid));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException1, false, false);
     }
 
     private OpenEhrContributionRequest createRequestData(

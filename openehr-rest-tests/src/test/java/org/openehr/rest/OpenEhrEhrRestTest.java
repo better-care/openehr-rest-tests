@@ -129,9 +129,9 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
                 () -> exchange(getTargetPath() + "/ehr/{ehr_id}", PUT, null, Object.class, headers, ehrUid));
         assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
 
-        Object body = httpException.getResponseBodyAsString();
+        String body = httpException.getResponseBodyAsString();
         assertThat(body).isNotNull();
-//        assertThat((Map)body).containsEntry("message", "The value of the ehr_id unique identifier must be valid UUID value.");
+        assertThat(body).contains("UUID");
     }
 
     @Test

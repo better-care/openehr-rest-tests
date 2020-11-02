@@ -2,7 +2,6 @@ package org.openehr.rest;
 
 import care.better.platform.model.Ehr;
 import care.better.platform.model.EhrStatus;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,10 +22,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -39,6 +38,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.http.HttpStatus.*;
 
@@ -242,21 +242,24 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("openEhr-ehr-id", ehrId);
 
-        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/query/aql?q={query}&ehr_id={ehr_id}&offset=2",
-                                                     GET,
-                                                     null,
-                                                     JsonNode.class,
-                                                     headers,
-                                                     query,
-                                                     "unknown-ehr-id");
-        assertThat(response.getStatusCode()).isEqualTo(CONFLICT);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/query/aql?q={query}&ehr_id={ehr_id}&offset=2",
+                               GET,
+                               null,
+                               String.class,
+                               headers,
+                               query,
+                               "unknown-ehr-id"));
+        assertThat(httpException.getStatusCode()).isEqualTo(CONFLICT);
     }
 
     @Test
     public void queryGet400() {
-
-        ResponseEntity<JsonNode> response = getResponse(getTargetPath() + "/query/aql?q=balblablablablabla", JsonNode.class);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/query/aql?q=balblablablablabla", String.class));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
@@ -358,15 +361,16 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         request.setQ(query);
         request.setOffset(2);
         request.setQueryParameters(Collections.singletonMap("ehr_id", "unknown-ehr-id"));
-
-        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/query/aql",
-                                                     POST,
-                                                     request,
-                                                     JsonNode.class,
-                                                     headers,
-                                                     query,
-                                                     "unknown-ehr-id");
-        assertThat(response.getStatusCode()).isEqualTo(CONFLICT);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/query/aql",
+                               POST,
+                               request,
+                               String.class,
+                               headers,
+                               query,
+                               "unknown-ehr-id"));
+        assertThat(httpException.getStatusCode()).isEqualTo(CONFLICT);
     }
 
     @Test
@@ -388,22 +392,26 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body.getRows()).hasSize(2);
 
         // 400 missing parameter
-        ResponseEntity<JsonNode> response2 = getResponse(
-                getTargetPath() + "/query/{qualified_query_name}?ehr_id={ehr_id}",
-                JsonNode.class,
-                qualifiedQueryName,
-                ehrId,
-                37.1d);
-        assertThat(response2.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/query/{qualified_query_name}?ehr_id={ehr_id}",
+                        String.class,
+                        qualifiedQueryName,
+                        ehrId,
+                        37.1d));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
 
         // 400 other
-        ResponseEntity<JsonNode> response3 = getResponse(
-                getTargetPath() + "/query/{qualified_query_name}?ehr_id={ehr_id}&temp={temp}",
-                JsonNode.class,
-                qualifiedQueryName,
-                37.1d,
-                ehrId);
-        assertThat(response3.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/query/{qualified_query_name}?ehr_id={ehr_id}&temp={temp}",
+                        String.class,
+                        qualifiedQueryName,
+                        37.1d,
+                        ehrId));
+        assertThat(httpException1.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
@@ -486,26 +494,30 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
 
         // 400 missing parameter
         queryParameters.remove("temp");
-        ResponseEntity<JsonNode> response2 = exchange(
-                getTargetPath() + "/query/{qualified_query_name}",
-                POST,
-                request,
-                JsonNode.class,
-                null,
-                tempLargerThanName);
-        assertThat(response2.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(
+                        getTargetPath() + "/query/{qualified_query_name}",
+                        POST,
+                        request,
+                        String.class,
+                        null,
+                        tempLargerThanName));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
 
         // 400 other
         queryParameters.put("ehr_id", 37.1d);
         queryParameters.put("temp", ehrId);
-        ResponseEntity<JsonNode> response3 = exchange(
-                getTargetPath() + "/query/{qualified_query_name}",
-                POST,
-                request,
-                JsonNode.class,
-                null,
-                tempLargerThanName);
-        assertThat(response3.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(
+                        getTargetPath() + "/query/{qualified_query_name}",
+                        POST,
+                        request,
+                        String.class,
+                        null,
+                        tempLargerThanName));
+        assertThat(httpException1.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
@@ -542,14 +554,16 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         queryParameters.put("temp", 37.1d);
         request.setQueryParameters(queryParameters);
 
-        ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + "/query/{qualified_query_name}",
-                POST,
-                request,
-                JsonNode.class,
-                headers,
-                tempLargerThanName);
-        assertThat(response.getStatusCode()).isEqualTo(CONFLICT);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(
+                        getTargetPath() + "/query/{qualified_query_name}",
+                        POST,
+                        request,
+                        String.class,
+                        headers,
+                        tempLargerThanName));
+        assertThat(httpException.getStatusCode()).isEqualTo(CONFLICT);
     }
 
     @Test
@@ -611,14 +625,16 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         request.setQueryParameters(queryParameters);
 
         // 200
-        ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + "/query/{qualified_query_name}",
-                POST,
-                request,
-                JsonNode.class,
-                headers,
-                tempLargerThanName);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(
+                        getTargetPath() + "/query/{qualified_query_name}",
+                        POST,
+                        request,
+                        String.class,
+                        headers,
+                        tempLargerThanName));
+        assertThat(httpException.getStatusCode()).isEqualTo(CONFLICT);
     }
 
     @Test
@@ -675,13 +691,15 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body.getQ()).isEqualTo(namedParameterQuery);
 
         // check that filter only by group is not working
-        ResponseEntity<JsonNode> response2 = getResponse(
-                getTargetPath() + "/definition/query/{qualified_query_name}/0.0.0", JsonNode.class, "group");
-        assertThat(response2.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/definition/query/{qualified_query_name}/0.0.0", String.class, "group"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
-        ResponseEntity<JsonNode> response3 = getResponse(
-                getTargetPath() + "/definition/query/{qualified_query_name}/0.0.0", JsonNode.class, "group::on");
-        assertThat(response3.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/definition/query/{qualified_query_name}/0.0.0", String.class, "group::on"));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
@@ -757,13 +775,14 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         OpenEhrViewRequest view = new OpenEhrViewRequest();
         view.setDescription(testQuery3);
         view.setQ(query);
-        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}?type={type}",
-                                                     PUT,
-                                                     view,
-                                                     JsonNode.class,
-                                                     null,
-                                                     testQuery3,
-                                                     "AQL");
+        ResponseEntity<String> response = exchange(
+                getTargetPath() + "/definition/query/{qualified_query_name}?type={type}",
+                PUT,
+                view,
+                String.class,
+                null,
+                testQuery3,
+                "AQL");
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
     }
 
@@ -773,14 +792,16 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         OpenEhrViewRequest view = new OpenEhrViewRequest();
         view.setDescription(testQuery4);
         view.setQ(query);
-        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/definition/query/{qualified_query_name}?type={type}",
-                                                     PUT,
-                                                     view,
-                                                     JsonNode.class,
-                                                     null,
-                                                     testQuery4,
-                                                     "UnsupportedType");
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/definition/query/{qualified_query_name}?type={type}",
+                               PUT,
+                               view,
+                               String.class,
+                               null,
+                               testQuery4,
+                               "UnsupportedType"));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
@@ -800,10 +821,10 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(response.getBody()).isNull();
 
         // versioning is unsupported
-        ResponseEntity<JsonNode> response1 = getResponse(
-                getTargetPath() + "/definition/query/{qualified_query_name}/2.0.0", JsonNode.class, testQuery5);
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
-
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/definition/query/{qualified_query_name}/2.0.0", String.class, testQuery5));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
@@ -818,20 +839,6 @@ public class OpenEhrQueryRestTest extends AbstractRestTest {
         assertThat(body.getSolutionVersion()).isEqualTo(conformance.getSolutionVersion());
         assertThat(body.getVendor()).isEqualTo(conformance.getVendor());
         assertThat(body.getEndpoints()).isEqualTo(conformance.getEndpoints());
-    }
-
-    private void uploadNamedQuery(String description, String name, String query) {
-        OpenEhrViewRequest request = new OpenEhrViewRequest();
-        request.setDescription(description);
-        request.setQ(query);
-        ResponseEntity<OpenEhrViewResponse> response = exchange(
-                getTargetPath() + "/definition/query/{qualified-query-name}",
-                PUT,
-                request,
-                OpenEhrViewResponse.class,
-                null,
-                name);
-        assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
     }
 
     private void deleteQuery(String queryName) {

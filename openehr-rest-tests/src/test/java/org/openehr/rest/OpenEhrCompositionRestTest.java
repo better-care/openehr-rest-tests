@@ -27,13 +27,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.openehr.data.OpenEhrConstants.*;
 import static org.springframework.http.HttpHeaders.IF_MATCH;
 import static org.springframework.http.HttpMethod.*;
@@ -98,50 +100,53 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void createComposition400() {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Object> response = exchange(getTargetPath() + POST_COMPOSITION_PATH, POST, compositionWrongType, Object.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + POST_COMPOSITION_PATH, POST, compositionWrongType, Object.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        validateLocationAndETag(httpException, false, false);
 
-        Object body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body).isInstanceOf(Map.class);
-        assertThat((Map<String, String>)body).containsEntry("message", "Cannot parse request data.");
-
-        validateLocationAndETag(response, false, false);
+        String body = httpException.getResponseBodyAsString();
+        assertThat(body).isNotEmpty();
+        assertThat(body).contains("Could not resolve type");
     }
 
     @Test
     public void createCompositionValidationErrors() {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, JsonNode.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
-        validateLocationAndETag(response, false, false);
-        JsonNode body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.get("message").asText()).isEqualTo("Composition validation failed (there are missing or invalid values).");
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, JsonNode.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
+        validateLocationAndETag(httpException, false, false);
+        String body = httpException.getResponseBodyAsString();
+        assertThat(body).isNotEmpty();
+        assertThat(body).contains("validation failed");
     }
 
     @Test
     public void createIncompleteCompositionValidationErrors() {
         HttpHeaders headers = fullRepresentationHeaders();
         headers.add(OpenEhrConstants.VERSION_LIFECYCLE_STATE, "code_string=\"" + VersionLifecycleState.INCOMPLETE.code() + "\"");
-        ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, JsonNode.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
-        validateLocationAndETag(response, false, false);
-        JsonNode body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.get("message").asText()).isEqualTo("Incomplete composition validation failed (there are missing or invalid values).");
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, JsonNode.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
+        validateLocationAndETag(httpException, false, false);
+        String body = httpException.getResponseBodyAsString();
+        assertThat(body).isNotEmpty();
+        assertThat(body).contains("validation failed");
     }
 
     @Test
     public void createComposition404() {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<OpenEhrErrorResponse> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, OpenEhrErrorResponse.class, headers, "blablabla");
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
-        assertThat(response.getBody()).isNotNull();
-        validateLocationAndETag(response, false, false);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + POST_COMPOSITION_PATH, POST, composition, OpenEhrErrorResponse.class, headers, "blablabla"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException, false, false);
+        assertThat(httpException.getResponseBodyAsString()).isNotEmpty();
     }
 
     @Test
@@ -168,25 +173,26 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         assertThat(((PartyIdentified)body1.getComposer()).getName()).isEqualTo("John Nurse");
 
         // 400 input Composition is invalid
-        ResponseEntity<JsonNode> response2 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionWrongType, JsonNode.class, headers, ehrId,
-                body1.getUid().getValue());
-        assertThat(response2.getStatusCode()).isEqualTo(BAD_REQUEST);
-        validateLocationAndETag(response2, false, false);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionWrongType, JsonNode.class, headers, ehrId, body1.getUid().getValue()));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        validateLocationAndETag(httpException, false, false);
 
         // 404 ehrUid not found
-        ResponseEntity<JsonNode> response3 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, "blablabla",
-                body1.getUid().getValue());
-        assertThat(response3.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response3, false, false);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, "blablabla", body1.getUid().getValue()));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException1, false, false);
 
         // 412 Precondition failed with wrong {version_uid}
-        ResponseEntity<JsonNode> response4 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, ehrId, versionUid);
-        assertThat(response4.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
-        validateLocationAndETag(response4);
-        String eTag = response4.getHeaders().getETag();
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, ehrId, versionUid));
+        assertThat(httpException2.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        validateLocationAndETag(httpException2);
+        String eTag = Objects.requireNonNull(httpException2.getResponseHeaders()).getETag();
         assertThat("\"" + new LocatableUid(versionUid).next() + '"').isEqualTo(eTag);
 
         // 412 Precondition failed with wrong Composition Uid
@@ -194,10 +200,11 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         HierObjectId hierObjectId = new HierObjectId();
         hierObjectId.setValue(UUID.randomUUID().toString());
         composition.setUid(hierObjectId);
-        ResponseEntity<JsonNode> response5 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, ehrId, versionUid1);
-        assertThat(response5.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
-        validateLocationAndETag(response5);
+        HttpStatusCodeException httpException3 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, JsonNode.class, headers, ehrId, versionUid1));
+        assertThat(httpException3.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        validateLocationAndETag(httpException3);
 
         // 204
         composition.setUid(null);
@@ -216,14 +223,14 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         HttpHeaders headers = fullRepresentationHeaders();
         headers.set(IF_MATCH, compositionUid);
         String compositionSimpleUid = new LocatableUid(compositionUid).getUid();
-
-        ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, unProcessableComposition, JsonNode.class, headers, ehrId, compositionSimpleUid);
-        assertThat(response.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
-        validateLocationAndETag(response, false, false);
-        JsonNode body = response.getBody();
-        assertThat(body).isNotNull();
-        assertThat(body.get("message").asText()).isEqualTo("Composition validation failed (there are missing or invalid values).");
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, unProcessableComposition, JsonNode.class, headers, ehrId, compositionSimpleUid));
+        assertThat(httpException.getStatusCode()).isEqualTo(UNPROCESSABLE_ENTITY);
+        validateLocationAndETag(httpException, false, false);
+        String body = httpException.getResponseBodyAsString();
+        assertThat(body).isNotEmpty();
+        assertThat(body).contains("validation failed");
     }
 
     @Test
@@ -235,16 +242,17 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         Composition body = response.getBody();
         assertThat(body).isNotNull();
 
-        ResponseEntity<String> response1 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, "blablabla",
-                body.getUid().getValue());
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response1, false, false);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, "blablabla", body.getUid().getValue()));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException, false, false);
 
-        ResponseEntity<String> response2 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, "blablabla");
-        assertThat(response2.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response2, false, false);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, "blablabla"));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException1, false, false);
 
         ResponseEntity<String> response3 = exchange(
                 getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, body.getUid().getValue());
@@ -254,27 +262,18 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
         String versionUid = body.getUid().getValue();
 
-        ResponseEntity<String> response4 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH,
-                DELETE,
-                null,
-                String.class,
-                headers,
-                ehrId,
-                versionUid);
-        assertThat(response4.getStatusCode()).isEqualTo(CONFLICT);
-        validateLocationAndETag(response4);
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, versionUid));
+        assertThat(httpException2.getStatusCode()).isEqualTo(CONFLICT);
+        validateLocationAndETag(httpException2);
 
-        ResponseEntity<String> response5 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH,
-                DELETE,
-                null,
-                String.class,
-                headers,
-                ehrId,
-                new LocatableUid(body.getUid().getValue()).next().toString());
-        assertThat(response5.getStatusCode()).isEqualTo(BAD_REQUEST);
-        validateLocationAndETag(response4);
+        String compositionUid = new LocatableUid(body.getUid().getValue()).next().toString();
+        HttpStatusCodeException httpException3 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, compositionUid));
+        assertThat(httpException3.getStatusCode()).isEqualTo(BAD_REQUEST);
+        validateLocationAndETag(httpException3);
     }
 
     @Test
@@ -303,12 +302,15 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void retrieveComposition404() {
         // 404 nonexistent ehr
-        ResponseEntity<OpenEhrErrorResponse> response = getResponse(
-                getTargetPath() + GET_COMPOSITION_PATH, OpenEhrErrorResponse.class, "blablabla", compositionUid);
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + GET_COMPOSITION_PATH, OpenEhrErrorResponse.class, "blablabla", compositionUid));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
         // 404 nonexistent composition uid
-        ResponseEntity<JsonNode> response1 = getResponse(getTargetPath() + GET_COMPOSITION_PATH, JsonNode.class, ehrId, nonExistingUid);
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + GET_COMPOSITION_PATH, JsonNode.class, ehrId, nonExistingUid));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
@@ -391,35 +393,41 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     public void retrieveCompositionByVersionAtTime404() {
         LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 404 nonexistent ehr
-        ResponseEntity<OpenEhrErrorResponse> response = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
-                OpenEhrErrorResponse.class,
-                "blablabla",
-                locatableUid.getUid(),
-                DATE_TIME_FORMATTER.print(DateTime.now()));
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response, false, false);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
+                        OpenEhrErrorResponse.class,
+                        "blablabla",
+                        locatableUid.getUid(),
+                        DATE_TIME_FORMATTER.print(DateTime.now())));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException, false, false);
 
         // 404 nonexistent composition uid
-        ResponseEntity<OpenEhrErrorResponse> response1 = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
-                OpenEhrErrorResponse.class,
-                ehrId,
-                UUID.randomUUID().toString(),
-                DATE_TIME_FORMATTER.print(DateTime.now()));
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response1, false, false);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        UUID.randomUUID().toString(),
+                        DATE_TIME_FORMATTER.print(DateTime.now())));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException1, false, false);
 
         // 404 nonexistent composition at version_at_time
         String invalidDateTimeString = "1018-12-29T12:40:57.995+02:00";
-        ResponseEntity<OpenEhrErrorResponse> response2 = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
-                OpenEhrErrorResponse.class,
-                ehrId,
-                locatableUid.getUid(),
-                invalidDateTimeString);
-        assertThat(response2.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response2, false, false);
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        locatableUid.getUid(),
+                        invalidDateTimeString));
+        assertThat(httpException2.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException2, false, false);
     }
 
     @Test
@@ -438,20 +446,24 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     public void retrieveVersionedComposition404() {
         LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 404 nonexistent ehr
-        ResponseEntity<OpenEhrErrorResponse> response = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
-                OpenEhrErrorResponse.class,
-                "blablablabla",
-                locatableUid.getUid());
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
+                        OpenEhrErrorResponse.class,
+                        "blablablabla",
+                        locatableUid.getUid()));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 nonexistent versionedObjectUid
-        ResponseEntity<OpenEhrErrorResponse> response1 = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
-                OpenEhrErrorResponse.class,
-                ehrId,
-                UUID.randomUUID().toString());
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        UUID.randomUUID().toString()));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
@@ -478,61 +490,73 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     public void retrieveCompositionVersion404() {
         LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 404 nonexistent ehr
-        ResponseEntity<OpenEhrErrorResponse> response = getResponse(
-                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OpenEhrErrorResponse.class,
-                "blablablabla",
-                locatableUid.getUid(),
-                locatableUid.toString());
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                        OpenEhrErrorResponse.class,
+                        "blablablabla",
+                        locatableUid.getUid(),
+                        locatableUid.toString()));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 nonexistent versionedObjectUid
-        ResponseEntity<OpenEhrErrorResponse> response1 = getResponse(
-                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OpenEhrErrorResponse.class,
-                ehrId,
-                UUID.randomUUID().toString(),
-                locatableUid.toString());
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        UUID.randomUUID().toString(),
+                        locatableUid.toString()));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 different versionedObjectUid and version_uid
-        ResponseEntity<OpenEhrErrorResponse> response2 = getResponse(
-                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OpenEhrErrorResponse.class,
-                ehrId,
-                locatableUid.getUid(),
-                new LocatableUid("unknown", locatableUid.getSystemId(), 1));
-        assertThat(response2.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        locatableUid.getUid(),
+                        new LocatableUid("unknown", locatableUid.getSystemId(), 1)));
+        assertThat(httpException2.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 400 different system id
         LocatableUid locatableUid1 = new LocatableUid(nonExistingUid);
-        ResponseEntity<OpenEhrErrorResponse> response4 = getResponse(
-                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OpenEhrErrorResponse.class,
-                ehrId,
-                locatableUid1.getUid(),
-                nonExistingUid);
-        assertThat(response4.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException3 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        locatableUid1.getUid(),
+                        nonExistingUid));
+        assertThat(httpException3.getStatusCode()).isEqualTo(BAD_REQUEST);
 
         // 404 uid not matching
-        ResponseEntity<OpenEhrErrorResponse> response5 = getResponse(
-                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OpenEhrErrorResponse.class,
-                ehrId,
-                locatableUid.getUid(),
-                nonExistingUid);
-        assertThat(response5.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException4 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        locatableUid.getUid(),
+                        nonExistingUid));
+        assertThat(httpException4.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 nonexistent version
         String uid = locatableUid.getUid();
         LocatableUid locatableUid2 = new LocatableUid(uid, "some.other.system", locatableUid.getVersion());
-        ResponseEntity<OpenEhrErrorResponse> response3 = getResponse(
-                getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OpenEhrErrorResponse.class,
-                ehrId,
-                uid,
-                locatableUid2.toString());
-        assertThat(response3.getStatusCode()).isEqualTo(BAD_REQUEST);
+        HttpStatusCodeException httpException5 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + GET_COMPOSITION_VERSION_PATH,
+                        OpenEhrErrorResponse.class,
+                        ehrId,
+                        uid,
+                        locatableUid2.toString()));
+        assertThat(httpException5.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test

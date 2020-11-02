@@ -9,6 +9,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
+import org.openehr.data.OpenEhrViewRequest;
+import org.openehr.data.OpenEhrViewResponse;
 import org.openehr.jaxb.rm.Composition;
 import org.openehr.jaxb.rm.Folder;
 import org.openehr.jaxb.rm.ObjectRef;
@@ -52,6 +54,7 @@ import static org.openehr.data.OpenEhrConstants.POST_COMPOSITION_PATH;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.*;
 
@@ -394,4 +397,24 @@ public class AbstractRestTest {
             }
         }
     }
+
+    protected void uploadNamedQuery(String description, String name, String query) {
+        OpenEhrViewRequest request = new OpenEhrViewRequest();
+        request.setDescription(description);
+        request.setQ(query);
+        try {
+            ResponseEntity<OpenEhrViewResponse> response = exchange(
+                    getTargetPath() + "/definition/query/{qualified-query-name}",
+                    PUT,
+                    request,
+                    OpenEhrViewResponse.class,
+                    null,
+                    name);
+        } catch (HttpClientErrorException e) {
+            if (e.getRawStatusCode() != 409) {
+                throw e;
+            }
+        }
+    }
+
 }

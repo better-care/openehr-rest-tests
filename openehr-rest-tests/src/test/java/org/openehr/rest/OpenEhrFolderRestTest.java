@@ -18,11 +18,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.IOException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.HttpHeaders.IF_MATCH;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.http.HttpStatus.*;
@@ -59,42 +61,39 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
 
     @Test
     public void createFolder400() {
-        ResponseEntity<OpenEhrErrorResponse> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
-                                                                 POST,
-                                                                 null,
-                                                                 OpenEhrErrorResponse.class,
-                                                                 null,
-                                                                 ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, null, OpenEhrErrorResponse.class, null, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException.getResponseBodyAsString()).isNotEmpty();
     }
 
     @Test
     public void createFolder404() {
-        ResponseEntity<OpenEhrErrorResponse> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
-                                                                 POST,
-                                                                 createFolder("folder1"),
-                                                                 OpenEhrErrorResponse.class,
-                                                                 null,
-                                                                 "blablablabla");
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
-        assertThat(response.getBody()).isNotNull();
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
+                               POST,
+                               createFolder("folder1"),
+                               OpenEhrErrorResponse.class,
+                               null,
+                               "blablablabla"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        assertThat(httpException.getResponseBodyAsString()).isNotEmpty();
     }
 
     @Test
     public void createFolder409() {
-        // given
         HttpHeaders headers = new HttpHeaders();
         Folder folder = createFolder("folder1");
 
-        // when
         ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, folder, Folder.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
 
-        ResponseEntity<JsonNode> secondResponse = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, folder, JsonNode.class, headers, ehrId);
-
-        // then
-        assertThat(secondResponse.getStatusCode()).isEqualTo(CONFLICT);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, folder, JsonNode.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(CONFLICT);
     }
 
     @Test
@@ -118,9 +117,11 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
 
         // 412 conflict of IF_MATCH provided uid
         headers.set(IF_MATCH, UUID.randomUUID().toString());
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, Folder.class, headers, ehrId);
-        assertThat(response.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
-        validateLocationAndETag(response);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, Folder.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        validateLocationAndETag(httpException);
 
         // check location
         validateLocationHeader(Folder.class, response.getHeaders().getLocation(), folder.getUid().getValue(), (Folder f) -> f.getUid().getValue());
@@ -132,15 +133,17 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         HttpHeaders headers = fullRepresentationHeaders();
         // 404 directory not found
         headers.setContentType(null);
-        ResponseEntity<OpenEhrErrorResponse> response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
-                                                                  DELETE,
-                                                                  null,
-                                                                  headers,
-                                                                  null,
-                                                                  OpenEhrErrorResponse.class,
-                                                                  ehrId);
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response1, false, false);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
+                               DELETE,
+                               null,
+                               headers,
+                               null,
+                               OpenEhrErrorResponse.class,
+                               ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException, false, false);
 
         // post directory
         ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), Folder.class, headers, ehrId);
@@ -150,23 +153,27 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         // 404 ehr_id not found
         headers.setContentType(null);
         headers.set(IF_MATCH, uid);
-        response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
-                             DELETE,
-                             null,
-                             headers,
-                             null,
-                             OpenEhrErrorResponse.class,
-                             "blablabla");
-        assertThat(response1.getStatusCode()).isEqualTo(NOT_FOUND);
-        validateLocationAndETag(response1, false, false);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory",
+                               DELETE,
+                               null,
+                               headers,
+                               null,
+                               OpenEhrErrorResponse.class,
+                               "blablabla"));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException1, false, false);
 
         // 412 conflict of IF_MATCH provided uid
         headers.setContentType(null);
         headers.set(IF_MATCH, UUID.randomUUID().toString());
-        response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", DELETE, null, headers, null, OpenEhrErrorResponse.class, ehrId);
-        assertThat(response1.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
-        validateLocationAndETag(response1);
-        assertThat(response1.getBody()).isNull();
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory", DELETE, null, headers, null, OpenEhrErrorResponse.class, ehrId));
+        assertThat(httpException2.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        validateLocationAndETag(httpException2);
+        assertThat(httpException2.getResponseBodyAsString()).isEmpty();
 
         // check location
         validateLocationHeader(Folder.class, response.getHeaders().getLocation(), uid, (Folder f) -> f.getUid().getValue());
@@ -174,7 +181,8 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         // 204
         headers.setContentType(null);
         headers.set(IF_MATCH, uid);
-        response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", DELETE, null, headers, null, OpenEhrErrorResponse.class, ehrId);
+        ResponseEntity<OpenEhrErrorResponse> response1 = exchange(
+                getTargetPath() + "/ehr/{ehr_id}/directory", DELETE, null, headers, null, OpenEhrErrorResponse.class, ehrId);
         assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response1, false, false);
     }
@@ -204,12 +212,16 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
 
         // 404 folder_uid not found
-        ResponseEntity<JsonNode> notFoundResponse = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, ehrId, "blablabla");
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, ehrId, "blablabla"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // 404 ehr_id not found
-        notFoundResponse = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, "blablabla", uid);
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, "blablabla", uid));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
@@ -306,12 +318,14 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         validateLocationHeader(Folder.class, response3.getHeaders().getLocation(), newName, (Folder f) -> f.getName().getValue());
 
         // 404 ehr_id not found
-        ResponseEntity<JsonNode> notFoundResponse = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
-                JsonNode.class,
-                "blablabla",
-                DATE_TIME_FORMATTER.print(before));
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
+                        JsonNode.class,
+                        "blablabla",
+                        DATE_TIME_FORMATTER.print(before)));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
         ResponseEntity<Folder> response4 = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
@@ -325,21 +339,25 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         // check location
         validateLocationHeader(Folder.class, response4.getHeaders().getLocation(), mainFolderName, (Folder f) -> f.getName().getValue());
 
-        notFoundResponse = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
-                JsonNode.class,
-                ehrId,
-                DATE_TIME_FORMATTER.print(before),
-                "someNonexistantFolderName");
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
+                        JsonNode.class,
+                        ehrId,
+                        DATE_TIME_FORMATTER.print(before),
+                        "someNonexistantFolderName"));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
 
-        notFoundResponse = getResponse(
-                getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
-                JsonNode.class,
-                ehrId,
-                DATE_TIME_FORMATTER.print(before.minusDays(1)),
-                subFolderName);
-        assertThat(notFoundResponse.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
+                        JsonNode.class,
+                        ehrId,
+                        DATE_TIME_FORMATTER.print(before.minusDays(1)),
+                        subFolderName));
+        assertThat(httpException2.getStatusCode()).isEqualTo(NOT_FOUND);
 
         // delete directory
         HttpHeaders deleteDirectoryHeaders = new HttpHeaders();
@@ -357,11 +375,13 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         assertThat(response5.getStatusCode()).isEqualTo(NO_CONTENT);
 
         // retrieve non-existing directory in the past while the last one has been deleted
-        ResponseEntity<JsonNode> notFoundResponse1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
-                                                                 JsonNode.class,
-                                                                 ehrId,
-                                                                 DATE_TIME_FORMATTER.print(atTheBeginning));
-        assertThat(notFoundResponse1.getStatusCode()).isEqualTo(NOT_FOUND);
+        HttpStatusCodeException httpException3 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
+                                  JsonNode.class,
+                                  ehrId,
+                                  DATE_TIME_FORMATTER.print(atTheBeginning)));
+        assertThat(httpException3.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     private Folder createFolder(String name) {
