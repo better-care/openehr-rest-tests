@@ -14,7 +14,7 @@
 
 package org.openehr.data;
 
-import org.openehr.jaxb.rm.PartyIdentified;
+import com.nedap.archie.rm.generic.PartyIdentified;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;

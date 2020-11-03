@@ -14,10 +14,13 @@
 
 package org.openehr.rest;
 
-import care.better.platform.locatable.LocatableUid;
-import care.better.platform.model.Ehr;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.nedap.archie.rm.support.identification.ObjectRef;
+import com.nedap.archie.rm.support.identification.ObjectVersionId;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -25,12 +28,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.openehr.data.OpenEhrViewRequest;
 import org.openehr.data.OpenEhrViewResponse;
-import org.openehr.jaxb.rm.Composition;
-import org.openehr.jaxb.rm.Folder;
-import org.openehr.jaxb.rm.ObjectRef;
-import org.openehr.jaxb.rm.ObjectVersionId;
 import org.openehr.rest.conf.WebClientConfiguration;
-import org.openehr.utils.FolderBuilder;
+import org.openehr.utils.LocatableUid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +45,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -96,29 +94,28 @@ public class AbstractRestTest {
     protected String nonExistingUid;
     protected String compositionUid;
     protected String compositionUid2;
-    protected Composition composition;
-    protected Composition unProcessableComposition;
+    protected JsonNode composition;
+    protected JsonNode unProcessableComposition;
 
     @BeforeAll
     public void setUp() throws IOException {
         targetPath = uri.toURL().toString();
         nonExistingUid = UUID.randomUUID() + "::domain3::1";
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Ehr> ehrResponseEntity = exchange(getTargetPath() + "/ehr", POST, null, Ehr.class, headers);
-        ehrId = Objects.requireNonNull(ehrResponseEntity.getBody()).getEhrId().getValue();
+        ResponseEntity<JsonNode> ehrResponseEntity = exchange(getTargetPath() + "/ehr", POST, null, JsonNode.class, headers);
+        ehrId = getFieldValue(Objects.requireNonNull(ehrResponseEntity.getBody()), "ehr_id");
 
         uploadTemplate("/rest/Demo Vitals.opt");
         composition = objectMapper.readValue(IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/composition.json"),
-                StandardCharsets.UTF_8).replace("{{REPLACE_THIS}}", "Jane Nurse"), Composition.class);
+                StandardCharsets.UTF_8).replace("{{REPLACE_THIS}}", "Jane Nurse"), JsonNode.class);
         assertThat(composition).isNotNull();
-        assertThat(composition.getUid()).isNull();
         compositionUid = postComposition(ehrId, composition);
         String jsonCompositionWithPlaceholder = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate-composition.json"),
                 StandardCharsets.UTF_8);
-        unProcessableComposition = objectMapper.readValue(jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "John Nurse"), Composition.class);
-        unProcessableComposition.setArchetypeNodeId("openEHR-EHR-COMPOSITION.report.sv2");
+        unProcessableComposition = objectMapper.readValue(jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "John Nurse"), JsonNode.class);
+        setTextNodeValue(unProcessableComposition, "archetype_node_id", "openEHR-EHR-COMPOSITION.report.sv2");
     }
 
     public String getTargetPath() {
@@ -330,15 +327,64 @@ public class AbstractRestTest {
         return headers;
     }
 
-    protected Folder createFolderWithSubfolder(String subFolderName, String mainFolderName) {
-        return FolderBuilder.createFolder()
-                .withName(mainFolderName)
-                .withItems(createFolderItem())
-                .withSubfolder(
-                        FolderBuilder.createFolder()
-                                .withName(subFolderName)
-                                .withItems(createFolderItem())
-                                .build()).build();
+    protected JsonNode createFolderWithSubfolder(String subFolderName, String mainFolderName) throws JsonProcessingException {
+        return objectMapper.readTree("{\r\n" +
+                                             "  \"_type\": \"FOLDER\",\r\n" +
+                                             "  \"name\": {\r\n" +
+                                             "    \"_type\": \"DV_TEXT\",\r\n" +
+                                             "    \"value\": \"" + mainFolderName + "\"\r\n" +
+                                             "  },\r\n" +
+                                             "  \"folders\": [\r\n" +
+                                             "    {\r\n" +
+                                             "      \"_type\": \"FOLDER\",\r\n" +
+                                             "      \"name\": {\r\n" +
+                                             "        \"_type\": \"DV_TEXT\",\r\n" +
+                                             "        \"value\": \"" + subFolderName + "\"\r\n" +
+                                             "      },\r\n" +
+                                             "      \"items\": [\r\n" +
+                                             "        {\r\n" +
+                                             "          \"_type\": \"OBJECT_REF\",\r\n" +
+                                             "          \"id\": {\r\n" +
+                                             "            \"_type\": \"OBJECT_VERSION_ID\",\r\n" +
+                                             "            \"value\": \"" + UUID.randomUUID().toString() + "\"\r\n" +
+                                             "          },\r\n" +
+                                             "          \"namespace\": \"namespace\",\r\n" +
+                                             "          \"type\": \"ANY\"\r\n" +
+                                             "        }\r\n" +
+                                             "      ]\r\n" +
+                                             "    }\r\n" +
+                                             "  ],\r\n" +
+                                             "  \"items\": [\r\n" +
+                                             "    {\r\n" +
+                                             "      \"_type\": \"OBJECT_REF\",\r\n" +
+                                             "      \"id\": {\r\n" +
+                                             "        \"_type\": \"OBJECT_VERSION_ID\",\r\n" +
+                                             "        \"value\": \"" + UUID.randomUUID().toString() + "\"\r\n" +
+                                             "      },\r\n" +
+                                             "      \"namespace\": \"namespace\",\r\n" +
+                                             "      \"type\": \"ANY\"\r\n" +
+                                             "    }\r\n" +
+                                             "  ]\r\n" +
+                                             "}");
+    }
+
+    protected JsonNode createFolder(String name) throws JsonProcessingException {
+        return objectMapper.readTree("{\r\n" +
+                                             "  \"_type\": \"FOLDER\",\r\n" +
+                                             "  \"name\": {\r\n" +
+                                             "    \"_type\": \"DV_TEXT\",\r\n" +
+                                             "    \"value\": \"" + name + "\"\r\n" +
+                                             "  },\r\n" +
+                                             "  \"folders\": [\r\n" +
+                                             "    {\r\n" +
+                                             "      \"_type\": \"FOLDER\",\r\n" +
+                                             "      \"name\": {\r\n" +
+                                             "        \"_type\": \"DV_TEXT\",\r\n" +
+                                             "        \"value\": \"" + name + "\\/F1\"\r\n" +
+                                             "      }\r\n" +
+                                             "    }\r\n" +
+                                             "  ]\r\n" +
+                                             "}");
     }
 
     private ObjectRef createFolderItem() {
@@ -352,30 +398,47 @@ public class AbstractRestTest {
         return item;
     }
 
-    protected <T> void validateLocationHeader(
-            Class<T> objectClass,
+    protected void validateLocationHeader(
+            String rmType,
             URI location,
             String folderStringToCheck,
-            Function<T, String> compareStringGetter) {
-        ResponseEntity<T> response = getResponse(location.toString(), objectClass);
+            Function<JsonNode, String> compareStringGetter) {
+        ResponseEntity<JsonNode> response = getResponse(location.toString(), JsonNode.class);
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        T object = response.getBody();
+        JsonNode object = response.getBody();
         assertThat(object).isNotNull();
+        assertThat(object.get("_type").asText()).isEqualTo(rmType);
         assertThat(folderStringToCheck).isEqualTo(compareStringGetter.apply(object));
     }
 
-    protected String postComposition(String ehrId, Composition medikationLoopComposition) {
+    protected String postComposition(String ehrId, Object compositionJson) {
         ResponseEntity<JsonNode> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, medikationLoopComposition, JsonNode.class, fullRepresentationHeaders(), ehrId);
+                getTargetPath() + POST_COMPOSITION_PATH, POST, compositionJson, JsonNode.class, fullRepresentationHeaders(), ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        return Objects.requireNonNull(response.getBody().get("uid").get("value").asText());
+        return getUid(Objects.requireNonNull(response.getBody()));
     }
 
-    protected void setCompositionUid(@javax.annotation.Nullable Composition composition, LocatableUid compositionUid) {
+    protected String getUid(JsonNode jsonNode) {
+        return getFieldValue(jsonNode, "uid");
+    }
+
+    protected String getFieldValue(JsonNode jsonNode, String fieldName) {
+        return jsonNode.get(fieldName).get("value").asText();
+    }
+
+    protected void setTextNodeValue(JsonNode object, String fieldName, String textNodeValue) {
+        if (textNodeValue != null) {
+            ((ObjectNode)object).set(fieldName, new TextNode(textNodeValue));
+        } else {
+            ((ObjectNode)object).set(fieldName, null);
+        }
+    }
+
+    protected void setCompositionUid(JsonNode composition, LocatableUid compositionUid) {
         if (composition != null) {
             ObjectVersionId objectVersionId = new ObjectVersionId();
             objectVersionId.setValue(compositionUid.toString());
-            composition.setUid(objectVersionId);
+            ((ObjectNode)composition).set("uid", objectMapper.convertValue(objectVersionId, JsonNode.class));
         }
     }
 
@@ -395,7 +458,7 @@ public class AbstractRestTest {
         return String.valueOf(random.nextInt());
     }
 
-    protected void uploadTemplate(@Nonnull String templatePath) throws IOException {
+    protected void uploadTemplate(String templatePath) throws IOException {
         String templateString = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream(templatePath),
                 StandardCharsets.UTF_8);

@@ -15,7 +15,6 @@
 package org.openehr.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.openehr.jaxb.am.Template;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,14 +36,14 @@ public class OpenEhrTemplateDefinition {
     public OpenEhrTemplateDefinition() {
     }
 
-    public OpenEhrTemplateDefinition(String templateId, OffsetDateTime createdTimestamp, Template template) {
-        this.templateId = templateId;
-        this.createdTimestamp = createdTimestamp;
-        concept = template.getConcept();
-        archetypeId = template.getDefinition() == null || template.getDefinition().getArchetypeId() == null
-                ? null
-                : template.getDefinition().getArchetypeId().getValue();
-    }
+//    public OpenEhrTemplateDefinition(String templateId, OffsetDateTime createdTimestamp, Template template) {
+//        this.templateId = templateId;
+//        this.createdTimestamp = createdTimestamp;
+//        concept = template.getConcept();
+//        archetypeId = template.getDefinition() == null || template.getDefinition().getArchetypeId() == null
+//                ? null
+//                : template.getDefinition().getArchetypeId().getValue();
+//    }
 
     @XmlElement(name = "template_id", required = true)
     @JsonProperty("template_id")

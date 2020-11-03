@@ -14,8 +14,8 @@
 
 package org.openehr.data;
 
-import care.better.platform.locatable.LocatableUid;
 import com.google.common.base.Preconditions;
+import org.openehr.utils.LocatableUid;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;

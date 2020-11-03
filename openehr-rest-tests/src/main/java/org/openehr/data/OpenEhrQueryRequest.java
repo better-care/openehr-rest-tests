@@ -14,12 +14,10 @@
 
 package org.openehr.data;
 
-import care.better.platform.model.adapter.MapParametersAdapter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -63,7 +61,6 @@ public class OpenEhrQueryRequest implements Serializable {
     }
 
     @XmlElement(name = "query_parameters")
-    @XmlJavaTypeAdapter(MapParametersAdapter.class)
     @JsonProperty(value = "query_parameters")
     public Map<String, Object> getQueryParameters() {
         return queryParameters;

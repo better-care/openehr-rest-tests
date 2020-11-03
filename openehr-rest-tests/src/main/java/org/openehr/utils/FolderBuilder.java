@@ -14,10 +14,10 @@
 
 package org.openehr.utils;
 
-import care.better.platform.util.ConversionUtils;
-import org.openehr.jaxb.rm.Folder;
-import org.openehr.jaxb.rm.ObjectRef;
-import org.openehr.jaxb.rm.ObjectVersionId;
+
+import com.nedap.archie.rm.directory.Folder;
+import com.nedap.archie.rm.support.identification.ObjectRef;
+import com.nedap.archie.rm.support.identification.ObjectVersionId;
 
 /**
  * @author Domen Muren
@@ -34,7 +34,7 @@ public final class FolderBuilder {
     }
 
     public FolderBuilder withName(String name) {
-        rootFolder.setName(ConversionUtils.getText(name));
+        rootFolder.setName(Utils.getText(name));
         return this;
     }
 

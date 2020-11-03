@@ -16,7 +16,7 @@ package org.openehr.rest.conf;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openehr.data.OpenEhrConformance;
-import org.openehr.rest.serialize.BetterObjectMapper;
+import org.openehr.rest.json.OpenEhrObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ public class WebClientConfiguration {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new BetterObjectMapper();
+        return new OpenEhrObjectMapper();
     }
 
     @Bean

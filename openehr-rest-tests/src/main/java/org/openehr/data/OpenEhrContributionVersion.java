@@ -14,10 +14,9 @@
 
 package org.openehr.data;
 
-import care.better.platform.openehr.rm.RmObject;
-import care.better.platform.service.AuditChangeType;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.openehr.jaxb.rm.PartyIdentified;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.nedap.archie.rm.generic.PartyProxy;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
@@ -25,20 +24,20 @@ import java.io.Serializable;
 /**
  * @author Dusan Markovic
  */
-public class OpenEhrContributionVersion<T extends RmObject> implements Serializable, Cloneable {
+public class OpenEhrContributionVersion implements Serializable, Cloneable {
     private static final long serialVersionUID = 2189225155652394124L;
-    private T data;
+    private JsonNode data;
     private String precedingVersionUid;
     private String signature;
     private int lifecycleState;
     private OpenEhrCommitAudit commitAudit;
 
     @XmlElement(required = true)
-    public T getData() {
+    public JsonNode getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(JsonNode data) {
         this.data = data;
     }
 
@@ -83,17 +82,17 @@ public class OpenEhrContributionVersion<T extends RmObject> implements Serializa
 
     public static class OpenEhrCommitAudit implements Serializable, Cloneable {
         private static final long serialVersionUID = 4508719136393176130L;
-        private AuditChangeType changeType;
+        private String changeType;
         private String description;
-        private PartyIdentified committer;
+        private PartyProxy committer;
 
         @XmlElement(required = true, name = "change_type")
         @JsonProperty("change_type")
-        public AuditChangeType getChangeType() {
+        public String getChangeType() {
             return changeType;
         }
 
-        public void setChangeType(AuditChangeType changeType) {
+        public void setChangeType(String changeType) {
             this.changeType = changeType;
         }
 
@@ -107,11 +106,11 @@ public class OpenEhrContributionVersion<T extends RmObject> implements Serializa
         }
 
         @XmlElement
-        public PartyIdentified getCommitter() {
+        public PartyProxy getCommitter() {
             return committer;
         }
 
-        public void setCommitter(PartyIdentified committer) {
+        public void setCommitter(PartyProxy committer) {
             this.committer = committer;
         }
     }

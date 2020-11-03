@@ -18,41 +18,16 @@
 
     <properties>
         <java.version>11</java.version>
-        <better-apis.version>3.1.0-A1</better-apis.version>
         <commons-io.version>2.6</commons-io.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>care.better.platform</groupId>
-            <artifactId>api</artifactId>
-            <version>${better-apis.version}</version>
+            <groupId>com.nedap.healthcare.archie</groupId>
+            <artifactId>openehr-rm</artifactId>
+            <version>0.10.0</version>
         </dependency>
-        <dependency>
-            <groupId>care.better.platform</groupId>
-            <artifactId>model</artifactId>
-            <version>${better-apis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>care.better.platform</groupId>
-            <artifactId>json</artifactId>
-            <version>${better-apis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>care.better.platform</groupId>
-            <artifactId>templates-api</artifactId>
-            <version>${better-apis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>care.better.platform</groupId>
-            <artifactId>jaxb</artifactId>
-            <version>${better-apis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>care.better.platform</groupId>
-            <artifactId>common</artifactId>
-            <version>${better-apis.version}</version>
-        </dependency>
+
         <!-- jaxb -->
         <dependency>
             <groupId>javax.xml.bind</groupId>

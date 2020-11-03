@@ -14,10 +14,7 @@
 
 package org.openehr.rest;
 
-import care.better.platform.locatable.LocatableUid;
-import care.better.platform.model.VersionedObjectDto;
-import care.better.platform.service.VersionLifecycleState;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,13 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrConstants;
 import org.openehr.data.OpenEhrErrorResponse;
-import org.openehr.jaxb.rm.Composition;
-import org.openehr.jaxb.rm.HierObjectId;
-import org.openehr.jaxb.rm.Locatable;
-import org.openehr.jaxb.rm.OriginalVersion;
-import org.openehr.jaxb.rm.PartyIdentified;
 import org.openehr.rest.conf.WebClientConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openehr.utils.LocatableUid;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -63,10 +55,7 @@ import static org.springframework.http.HttpStatus.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {WebClientConfiguration.class})
 public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private Composition compositionUpdated;
+    private String compositionUpdated;
     private String compositionWrongType;
     private DateTime before;
 
@@ -78,7 +67,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         String jsonCompositionWithPlaceholder = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate-composition.json"),
                 StandardCharsets.UTF_8);
-        compositionUpdated = objectMapper.readValue(jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "John Nurse"), Composition.class);
+        compositionUpdated = jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "John Nurse");
         compositionWrongType = IOUtils.toString(
                 OpenEhrCompositionRestTest.class.getResourceAsStream("/rest/AtemfrequenzTemplate-composition-wrong-type.json"),
                 StandardCharsets.UTF_8);
@@ -87,25 +76,25 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         uploadTemplate("/rest/MedikationLoop.opt");
 
         String anotherComposition = jsonCompositionWithPlaceholder.replace("{{REPLACE_THIS}}", "Just Someone");
-        compositionUid2 = postComposition(ehrId, objectMapper.readValue(anotherComposition, Composition.class));
+        compositionUid2 = postComposition(ehrId, anotherComposition);
         before = DateTime.now();
     }
 
     @Test
     public void createComposition() {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Composition> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, Composition.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        Composition body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getUid()).isNotNull();
+        assertThat(getUid(body)).isNotNull();
         validateLocationAndETag(response);
 
-        ResponseEntity<Composition> response1 = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, Composition.class, null, ehrId);
+        ResponseEntity<JsonNode> response1 = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, null, ehrId);
         assertThat(response1.getStatusCode()).isEqualTo(CREATED);
-        Composition body1 = response1.getBody();
+        JsonNode body1 = response1.getBody();
         assertThat(body1).isNull();
         validateLocationAndETag(response1);
     }
@@ -140,7 +129,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void createIncompleteCompositionValidationErrors() {
         HttpHeaders headers = fullRepresentationHeaders();
-        headers.add(OpenEhrConstants.VERSION_LIFECYCLE_STATE, "code_string=\"" + VersionLifecycleState.INCOMPLETE.code() + "\"");
+        headers.add(OpenEhrConstants.VERSION_LIFECYCLE_STATE, "code_string=\"553\"");   // incomplete
         HttpStatusCodeException httpException = assertThrows(
                 HttpStatusCodeException.class,
                 () -> exchange(getTargetPath() + POST_COMPOSITION_PATH, POST, unProcessableComposition, String.class, headers, ehrId));
@@ -165,37 +154,37 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void updateComposition() {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Composition> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, Composition.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        Composition body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getUid()).isNotNull();
-        assertThat(body.getComposer()).isInstanceOf(PartyIdentified.class);
-        assertThat(((PartyIdentified)body.getComposer()).getName()).isEqualTo("Jane Nurse");
+//        assertThat(body.getUid()).isNotNull();
+//        assertThat(body.getComposer()).isInstanceOf(PartyIdentified.class);
+//        assertThat(((PartyIdentified)body.getComposer()).getName()).isEqualTo("Jane Nurse");
 
-        String versionUid = body.getUid().getValue();
+        String versionUid = getUid(body);
         headers.set(IF_MATCH, versionUid);
         String compositionUid = new LocatableUid(versionUid).getUid();
 
-        ResponseEntity<Composition> response1 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionUpdated, Composition.class, headers, ehrId, compositionUid);
+        ResponseEntity<JsonNode> response1 = exchange(
+                getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionUpdated, JsonNode.class, headers, ehrId, compositionUid);
         assertThat(response1.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response1);
-        Composition body1 = response1.getBody();
-        assertThat(((PartyIdentified)body1.getComposer()).getName()).isEqualTo("John Nurse");
-
+        JsonNode body1 = response1.getBody();
+//        assertThat(((PartyIdentified)body1.getComposer()).getName()).isEqualTo("John Nurse");
+        String compositionUid1 = getUid(body1);
         // 400 input Composition is invalid
         HttpStatusCodeException httpException = assertThrows(
                 HttpStatusCodeException.class,
-                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionWrongType, String.class, headers, ehrId, body1.getUid().getValue()));
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionWrongType, String.class, headers, ehrId, compositionUid1));
         assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
         validateLocationAndETag(httpException, false, false);
 
         // 404 ehrUid not found
         HttpStatusCodeException httpException1 = assertThrows(
                 HttpStatusCodeException.class,
-                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, String.class, headers, "blablabla", body1.getUid().getValue()));
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, String.class, headers, "blablabla", compositionUid1));
         assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
         validateLocationAndETag(httpException1, false, false);
 
@@ -209,26 +198,25 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         assertThat("\"" + new LocatableUid(versionUid).next() + '"').isEqualTo(eTag);
 
         // 412 Precondition failed with wrong Composition Uid
-        String versionUid1 = body1.getUid().getValue();
-        HierObjectId hierObjectId = new HierObjectId();
-        hierObjectId.setValue(UUID.randomUUID().toString());
-        composition.setUid(hierObjectId);
+//        HierObjectId hierObjectId = new HierObjectId();
+//        hierObjectId.setValue(UUID.randomUUID().toString());
+//        composition.setUid(hierObjectId);
         HttpStatusCodeException httpException3 = assertThrows(
                 HttpStatusCodeException.class,
-                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, String.class, headers, ehrId, versionUid1));
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, String.class, headers, ehrId, compositionUid1));
         assertThat(httpException3.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
         validateLocationAndETag(httpException3);
 
         // 204
-        composition.setUid(null);
-        HttpHeaders simpleHeaders = new HttpHeaders();
-        simpleHeaders.set(IF_MATCH, versionUid1);
-        String compositionVersionUid1 = new LocatableUid(versionUid1).getUid();
-        ResponseEntity<String> response6 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, String.class, simpleHeaders, ehrId, compositionVersionUid1);
-        assertThat(response6.getStatusCode()).isEqualTo(NO_CONTENT);
-        validateLocationAndETag(response6);
-        assertThat(response6.getBody()).isNull();
+//        composition.setUid(null);
+//        HttpHeaders simpleHeaders = new HttpHeaders();
+//        simpleHeaders.set(IF_MATCH, versionUid1);
+//        String compositionVersionUid1 = new LocatableUid(versionUid1).getUid();
+//        ResponseEntity<String> response6 = exchange(
+//                getTargetPath() + GET_COMPOSITION_PATH, PUT, composition, String.class, simpleHeaders, ehrId, compositionVersionUid1);
+//        assertThat(response6.getStatusCode()).isEqualTo(NO_CONTENT);
+//        validateLocationAndETag(response6);
+//        assertThat(response6.getBody()).isNull();
     }
 
     @Test
@@ -249,15 +237,16 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void deleteComposition() {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Composition> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, Composition.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        Composition body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
+        String versionUid = getUid(body);
 
         HttpStatusCodeException httpException = assertThrows(
                 HttpStatusCodeException.class,
-                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, "blablabla", body.getUid().getValue()));
+                () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, "blablabla", versionUid));
         assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
         validateLocationAndETag(httpException, false, false);
 
@@ -268,12 +257,11 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         validateLocationAndETag(httpException1, false, false);
 
         ResponseEntity<String> response3 = exchange(
-                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, body.getUid().getValue());
+                getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, versionUid);
         assertThat(response3.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response3);
         assertThat(response3.getBody()).isNull();
 
-        String versionUid = body.getUid().getValue();
 
         HttpStatusCodeException httpException2 = assertThrows(
                 HttpStatusCodeException.class,
@@ -281,7 +269,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         assertThat(httpException2.getStatusCode()).isEqualTo(CONFLICT);
         validateLocationAndETag(httpException2);
 
-        String compositionUid = new LocatableUid(body.getUid().getValue()).next().toString();
+        String compositionUid = new LocatableUid(versionUid).next().toString();
         HttpStatusCodeException httpException3 = assertThrows(
                 HttpStatusCodeException.class,
                 () -> exchange(getTargetPath() + GET_COMPOSITION_PATH, DELETE, null, String.class, headers, ehrId, compositionUid));
@@ -292,9 +280,9 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void retrieveComposition() {
         // 200
-        ResponseEntity<Composition> response = getResponse(getTargetPath() + GET_COMPOSITION_PATH, Composition.class, ehrId, compositionUid);
+        ResponseEntity<JsonNode> response = getResponse(getTargetPath() + GET_COMPOSITION_PATH, JsonNode.class, ehrId, compositionUid);
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        Composition body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
     }
 
@@ -307,7 +295,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
 
         // 204 get deleted compostiion
         String deletedVersionUid = response1.getHeaders().getETag().replaceAll("\"", "");
-        ResponseEntity<Composition> response = getResponse(getTargetPath() + GET_COMPOSITION_PATH, Composition.class, ehrId, deletedVersionUid);
+        ResponseEntity<JsonNode> response = getResponse(getTargetPath() + GET_COMPOSITION_PATH, JsonNode.class, ehrId, deletedVersionUid);
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
         assertThat(response1.getHeaders().getETag()).isEqualTo('"' + deletedVersionUid + '"');
     }
@@ -330,58 +318,59 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     public void retrieveCompositionByVersionAtTime() {
         HttpHeaders headers = fullRepresentationHeaders();
 
-        ResponseEntity<Composition> response = exchange(
-                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, Composition.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(
+                getTargetPath() + POST_COMPOSITION_PATH, POST, composition, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
         DateTime before = DateTime.now();
 
-        Composition body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getUid()).isNotNull();
-        assertThat(body.getComposer()).isInstanceOf(PartyIdentified.class);
-        assertThat(((PartyIdentified)body.getComposer()).getName()).isEqualTo("Jane Nurse");
+        assertThat(getUid(body)).isNotNull();
+        assertThat(body.get("composer").get("_type").asText()).isEqualTo("PARTY_IDENTIFIED");
+        assertThat(body.get("composer").get("name").asText()).isEqualTo("Jane Nurse");
 
-        String versionUid = body.getUid().getValue();
+        String versionUid = getUid(body);
         headers.set(IF_MATCH, versionUid);
         String compositionUid = new LocatableUid(versionUid).getUid();
 
-        ResponseEntity<Composition> response1 = exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionUpdated, Composition.class,
+        ResponseEntity<JsonNode> response1 = exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionUpdated, JsonNode.class,
                                                          headers, ehrId, compositionUid);
         assertThat(response1.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response1);
-        Composition body1 = response1.getBody();
+        JsonNode body1 = response1.getBody();
         assertThat(body1).isNotNull();
-        assertThat(body1.getUid()).isNotNull();
-        assertThat(((PartyIdentified)body1.getComposer()).getName()).isEqualTo("John Nurse");
-        LocatableUid locatableUid = new LocatableUid(body1.getUid().getValue());
+        String uid = getUid(body1);
+        assertThat(uid).isNotNull();
+        assertThat(body1.get("composer").get("name").asText()).isEqualTo("John Nurse");
+        LocatableUid locatableUid = new LocatableUid(uid);
 
-        ResponseEntity<Composition> response2 = getResponse(
+        ResponseEntity<JsonNode> response2 = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
-                Composition.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid(),
                 DATE_TIME_FORMATTER.print(before));
         assertThat(response2.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response2, false, false);
-        Composition body2 = response2.getBody();
+        JsonNode body2 = response2.getBody();
         assertThat(body2).isNotNull();
-        assertThat(body2.getUid()).isNotNull();
-        assertThat(body2.getComposer()).isInstanceOf(PartyIdentified.class);
-        assertThat(((PartyIdentified)body2.getComposer()).getName()).isEqualTo("Jane Nurse");
+        assertThat(getUid(body2)).isNotNull();
+        assertThat(body2.get("composer").get("_type").asText()).isEqualTo("PARTY_IDENTIFIED");
+        assertThat(body2.get("composer").get("name").asText()).isEqualTo("Jane Nurse");
 
-        ResponseEntity<Composition> response3 = getResponse(
+        ResponseEntity<JsonNode> response3 = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
-                Composition.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid(),
                 DATE_TIME_FORMATTER.print(DateTime.now()));
         assertThat(response3.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response3, false, false);
-        Composition body3 = response3.getBody();
+        JsonNode body3 = response3.getBody();
         assertThat(body3).isNotNull();
-        assertThat(body3.getUid()).isNotNull();
-        assertThat(body3.getComposer()).isInstanceOf(PartyIdentified.class);
-        assertThat(((PartyIdentified)body3.getComposer()).getName()).isEqualTo("John Nurse");
+        assertThat(getUid(body3)).isNotNull();
+        assertThat(body3.get("composer").get("_type").asText()).isEqualTo("PARTY_IDENTIFIED");
+        assertThat(body3.get("composer").get("name").asText()).isEqualTo("John Nurse");
     }
 
     @Test
@@ -392,9 +381,9 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         validateLocationAndETag(response1);
         LocatableUid locatableUid = new LocatableUid(compositionUid2);
         // 204 get deleted composition
-        ResponseEntity<Composition> response = getResponse(
+        ResponseEntity<JsonNode> response = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/composition/{versioned_object_uid}?version_at_time={version_at_time}",
-                Composition.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid(),
                 DATE_TIME_FORMATTER.print(DateTime.now()));
@@ -446,9 +435,9 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     @Test
     public void retrieveVersionedComposition() {
         LocatableUid locatableUid = new LocatableUid(compositionUid2);
-        ResponseEntity<VersionedObjectDto> response = getResponse(
+        ResponseEntity<JsonNode> response = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/versioned_composition/{versioned_object_uid}",
-                VersionedObjectDto.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid());
         assertThat(response.getStatusCode()).isEqualTo(OK);
@@ -483,19 +472,19 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
     public void retrieveCompositionVersion() {
 
         LocatableUid locatableUid = new LocatableUid(compositionUid2);
-        ResponseEntity<OriginalVersion> response = getResponse(
+        ResponseEntity<JsonNode> response = getResponse(
                 getTargetPath() + GET_COMPOSITION_VERSION_PATH,
-                OriginalVersion.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid(),
                 locatableUid.toString());
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        OriginalVersion body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getPrecedingVersionUid()).isNull();
-        assertThat(body.getData()).isNotNull();
-        assertThat(body.getData()).isOfAnyClassIn(Composition.class);
-        assertThat(((Locatable)body.getData()).getUid().getValue()).isEqualTo(locatableUid.toString());
+        assertThat(body.has("preceding_version_uid")).isFalse();
+        assertThat(body.get("data")).isNotNull();
+        assertThat(body.get("data").get("_type").asText()).isEqualTo("COMPOSITION");
+        assertThat(getUid(body.get("data"))).isEqualTo(locatableUid.toString());
         validateLocationAndETag(response);
     }
 
@@ -581,32 +570,32 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response1);
 
-        ResponseEntity<OriginalVersion> response = getResponse(
+        ResponseEntity<JsonNode> response = getResponse(
                 getTargetPath() + GET_VERSIONED_COMPOSITION_PATH + "?version_at_time={version_at_time}",
-                OriginalVersion.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid(),
                 DATE_TIME_FORMATTER.print(before));
         assertThat(response.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response);
-        OriginalVersion body = response.getBody();
+        JsonNode body = response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getData()).isNotNull();
-        assertThat(body.getLifecycleState().getValue()).isEqualTo(VersionLifecycleState.COMPLETE.value());
+        assertThat(body.get("data")).isNotNull();
+        assertThat(body.get("lifecycle_state").get("value").asText()).isEqualTo("complete");
 
         DateTime after = DateTime.now();
-        ResponseEntity<OriginalVersion> response2 = getResponse(
+        ResponseEntity<JsonNode> response2 = getResponse(
                 getTargetPath() + GET_VERSIONED_COMPOSITION_PATH + "?version_at_time={version_at_time}",
-                OriginalVersion.class,
+                JsonNode.class,
                 ehrId,
                 locatableUid.getUid(),
                 DATE_TIME_FORMATTER.print(after));
         assertThat(response2.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response2);
-        OriginalVersion body1 = response2.getBody();
+        JsonNode body1 = response2.getBody();
         assertThat(body1).isNotNull();
-        assertThat(body1.getData()).isNull();
-        assertThat(body1.getLifecycleState().getValue()).isEqualTo(VersionLifecycleState.DELETED.value());
+        assertThat(body1.has("data")).isFalse();
+        assertThat(body1.get("lifecycle_state").get("value").asText()).isEqualTo("deleted");
 
         compositionUid2 = postComposition(ehrId, compositionUpdated);
     }

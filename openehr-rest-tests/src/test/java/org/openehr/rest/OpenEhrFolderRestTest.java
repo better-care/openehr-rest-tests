@@ -14,16 +14,17 @@
 
 package org.openehr.rest;
 
-import care.better.platform.locatable.LocatableUid;
-import care.better.platform.util.ConversionUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrErrorResponse;
-import org.openehr.jaxb.rm.Folder;
 import org.openehr.rest.conf.WebClientConfiguration;
+import org.openehr.utils.LocatableUid;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -59,18 +60,19 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void createFolder() {
+    public void createFolder() throws JsonProcessingException {
         // full representation
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), Folder.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), JsonNode.class, headers,
+                                                     ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        Folder folder = response.getBody();
+        JsonNode folder = response.getBody();
         assertThat(folder).isNotNull();
-        assertThat(folder.getUid()).isNotNull();
+        assertThat(getUid(folder)).isNotNull();
         validateLocationAndETag(response);
 
         // check location
-        validateLocationHeader(Folder.class, response.getHeaders().getLocation(), folder.getUid().getValue(), (Folder f) -> f.getUid().getValue());
+        validateLocationHeader("FOLDER", response.getHeaders().getLocation(), getUid(folder), this::getUid);
     }
 
     @Test
@@ -97,11 +99,11 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void createFolder409() {
+    public void createFolder409() throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
-        Folder folder = createFolder("folder1");
+        JsonNode folder = createFolder("folder1");
 
-        ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, folder, Folder.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, folder, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
 
         HttpStatusCodeException httpException = assertThrows(
@@ -111,38 +113,39 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void updateFolder() {
+    public void updateFolder() throws JsonProcessingException {
         HttpHeaders headers = fullRepresentationHeaders();
-        ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), Folder.class, headers, ehrId);
+        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), JsonNode.class, headers,
+                                                     ehrId);
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        Folder requestFolder = response.getBody();
+        JsonNode requestFolder = response.getBody();
 
         // 200 full representation
-        headers.set(IF_MATCH, requestFolder.getUid().getValue());
-        requestFolder.setUid(null);
-        requestFolder.getName().setValue("NewName");
-        response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, Folder.class, headers, ehrId);
+        headers.set(IF_MATCH, getUid(requestFolder));
+        ((ObjectNode)requestFolder).set("uid", null);
+        ((ObjectNode)requestFolder.get("name")).set("value", new TextNode("NewName"));
+        response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, JsonNode.class, headers, ehrId);
         assertThat(response.getStatusCode()).isEqualTo(OK);
-        Folder folder = response.getBody();
+        JsonNode folder = response.getBody();
         assertThat(folder).isNotNull();
-        assertThat(folder.getUid()).isNotNull();
-        assertThat(folder.getName().getValue()).isEqualTo("NewName");
+        assertThat(folder.get("uid")).isNotNull();
+        assertThat(folder.get("name").get("value").asText()).isEqualTo("NewName");
         validateLocationAndETag(response);
 
         // 412 conflict of IF_MATCH provided uid
         headers.set(IF_MATCH, UUID.randomUUID().toString());
         HttpStatusCodeException httpException = assertThrows(
                 HttpStatusCodeException.class,
-                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, Folder.class, headers, ehrId));
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, JsonNode.class, headers, ehrId));
         assertThat(httpException.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
         validateLocationAndETag(httpException);
 
         // check location
-        validateLocationHeader(Folder.class, response.getHeaders().getLocation(), folder.getUid().getValue(), (Folder f) -> f.getUid().getValue());
+        validateLocationHeader("FOLDER", response.getHeaders().getLocation(), getUid(folder), this::getUid);
     }
 
     @Test
-    public void deleteFolder() {
+    public void deleteFolder() throws JsonProcessingException {
 
         HttpHeaders headers = fullRepresentationHeaders();
         // 404 directory not found
@@ -160,9 +163,10 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         validateLocationAndETag(httpException, false, false);
 
         // post directory
-        ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), Folder.class, headers, ehrId);
-        Folder requestFolder = response.getBody();
-        String uid = requestFolder.getUid().getValue();
+        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, createFolder("folder1"), JsonNode.class, headers,
+                                                     ehrId);
+        JsonNode requestFolder = response.getBody();
+        String uid = getUid(requestFolder);
 
         // 404 ehr_id not found
         headers.setContentType(null);
@@ -190,7 +194,7 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         assertThat(httpException2.getResponseBodyAsString()).isEmpty();
 
         // check location
-        validateLocationHeader(Folder.class, response.getHeaders().getLocation(), uid, (Folder f) -> f.getUid().getValue());
+        validateLocationHeader("FOLDER", response.getHeaders().getLocation(), uid, this::getUid);
 
         // 204
         headers.setContentType(null);
@@ -202,22 +206,22 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void retrieveFolder() {
+    public void retrieveFolder() throws JsonProcessingException {
 
-        ResponseEntity<Folder> response = exchange(
+        ResponseEntity<JsonNode> response = exchange(
                 getTargetPath() + "/ehr/{ehr_id}/directory",
                 POST,
                 createFolder("folder1"),
-                Folder.class,
+                JsonNode.class,
                 fullRepresentationHeaders(),
                 ehrId);
-        String uid = response.getBody().getUid().getValue();
+        String uid = getUid(response.getBody());
 
         // 200
-        response = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", Folder.class, ehrId, uid);
+        response = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}", JsonNode.class, ehrId, uid);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response, false, false);
-        Folder folder = response.getBody();
+        JsonNode folder = response.getBody();
         assertThat(folder).isNotNull();
 
         HttpHeaders headers = new HttpHeaders();
@@ -239,97 +243,98 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
     }
 
     @Test
-    public void retrieveFolderWithPath() {
+    public void retrieveFolderWithPath() throws JsonProcessingException {
 
         String subFolderName = "subFolder";
         String mainFolderName = "MainFolder";
-        Folder requestFolder = createFolderWithSubfolder(subFolderName, mainFolderName);
+        JsonNode requestFolder = createFolderWithSubfolder(subFolderName, mainFolderName);
         HttpHeaders fullRepresentationHeaders = fullRepresentationHeaders();
-        ResponseEntity<Folder> response = exchange(
+        ResponseEntity<JsonNode> response = exchange(
                 getTargetPath() + "/ehr/{ehr_id}/directory",
                 POST,
                 requestFolder,
-                Folder.class,
+                JsonNode.class,
                 fullRepresentationHeaders,
                 ehrId);
-        String uid = response.getBody().getUid().getValue();
+        String uid = getUid(response.getBody());
 
         // 200
-        response = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}?path={path}", Folder.class, ehrId, uid, subFolderName);
+        response = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}?path={path}", JsonNode.class, ehrId, uid, subFolderName);
         assertThat(response.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response, false, false);
-        Folder folder = response.getBody();
+        JsonNode folder = response.getBody();
         assertThat(folder).isNotNull();
-        assertThat(folder.getName().getValue()).isEqualTo(subFolderName);
+        assertThat(folder.get("name").get("value").asText()).isEqualTo(subFolderName);
 
         // 204 for nonexistant path
-        response = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}?path={path}", Folder.class, ehrId, uid, "someNonexistantFolderName");
+        response = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory/{version_uid}?path={path}", JsonNode.class, ehrId, uid, "someNonexistantFolderName");
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
         folder = response.getBody();
         assertThat(folder).isNull();
     }
 
     @Test
-    public void retrieveFolderByTimestamp() throws InterruptedException {
+    public void retrieveFolderByTimestamp() throws InterruptedException, JsonProcessingException {
         DateTime atTheBeginning = DateTime.now();
 
         HttpHeaders headers = fullRepresentationHeaders();
         String subFolderName = "subFolder";
         String mainFolderName = "MainFolder";
-        Folder inputFolder = createFolderWithSubfolder(subFolderName, mainFolderName);
-        ResponseEntity<Folder> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, inputFolder, Folder.class, headers, ehrId);
+        JsonNode inputFolder = createFolderWithSubfolder(subFolderName, mainFolderName);
+        ResponseEntity<JsonNode> response = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", POST, inputFolder, JsonNode.class, headers, ehrId);
+        JsonNode requestFolder = response.getBody();
+        assertThat(requestFolder).isNotNull();
         DateTime before = DateTime.now();
         Thread.sleep(100);
 
-        Folder requestFolder = response.getBody();
-        String uid = requestFolder.getUid().getValue();
+        String uid = getUid(requestFolder);
 
-        String oldName = requestFolder.getName().getValue();
+        String oldName = getFieldValue(requestFolder, "name");
         String newName = "NewName";
-        requestFolder.setUid(null);
-        requestFolder.getName().setValue(newName);
+        ((ObjectNode)requestFolder).set("uid", null);
+        ((ObjectNode)requestFolder.get("name")).set("value", new TextNode(newName));
 
         HttpHeaders headers1 = new HttpHeaders();
         headers1.set(IF_MATCH, uid);
-        ResponseEntity<Folder> response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, Folder.class, headers1, ehrId);
+        ResponseEntity<JsonNode> response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/directory", PUT, requestFolder, JsonNode.class, headers1, ehrId);
         assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
         validateLocationAndETag(response1);
 
         // check location
         LocatableUid precedingUid = new LocatableUid(uid);
-        validateLocationHeader(Folder.class, response1.getHeaders().getLocation(), precedingUid.next().toString(), (Folder f) -> f.getUid().getValue());
+        validateLocationHeader("FOLDER", response1.getHeaders().getLocation(), precedingUid.next().toString(), this::getUid);
         uid = getHeaderETag(response1);
 
         // retrieve before change
-        ResponseEntity<Folder> response2 = getResponse(
+        ResponseEntity<JsonNode> response2 = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
-                Folder.class,
+                JsonNode.class,
                 ehrId,
                 DATE_TIME_FORMATTER.print(before));
         assertThat(response2.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response2);
-        Folder folder = response2.getBody();
+        JsonNode folder = response2.getBody();
         assertThat(folder).isNotNull();
-        assertThat(folder.getName().getValue()).isEqualTo(oldName);
+        assertThat(folder.get("name").get("value").asText()).isEqualTo(oldName);
 
         // check location
-        validateLocationHeader(Folder.class, response2.getHeaders().getLocation(), oldName, (Folder f) -> f.getName().getValue());
+        validateLocationHeader("FOLDER", response2.getHeaders().getLocation(), oldName, jsonNode -> getFieldValue(jsonNode, "name"));
 
         // retrieve after change
         DateTime after = DateTime.now();
-        ResponseEntity<Folder> response3 = getResponse(
+        ResponseEntity<JsonNode> response3 = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}",
-                Folder.class,
+                JsonNode.class,
                 ehrId,
                 DATE_TIME_FORMATTER.print(after));
         assertThat(response3.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response3);
         folder = response3.getBody();
         assertThat(folder).isNotNull();
-        assertThat(folder.getName().getValue()).isEqualTo(newName);
+        assertThat(folder.get("name").get("value").asText()).isEqualTo(newName);
 
         // check location
-        validateLocationHeader(Folder.class, response3.getHeaders().getLocation(), newName, (Folder f) -> f.getName().getValue());
+        validateLocationHeader("FOLDER", response3.getHeaders().getLocation(), newName, jsonNode -> getFieldValue(jsonNode, "name"));
 
         // 404 ehr_id not found
         HttpStatusCodeException httpException = assertThrows(
@@ -341,9 +346,9 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
                         DATE_TIME_FORMATTER.print(before)));
         assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
 
-        ResponseEntity<Folder> response4 = getResponse(
+        ResponseEntity<JsonNode> response4 = getResponse(
                 getTargetPath() + "/ehr/{ehr_id}/directory?version_at_time={version_at_time}&path={path}",
-                Folder.class,
+                JsonNode.class,
                 ehrId,
                 DATE_TIME_FORMATTER.print(before),
                 subFolderName);
@@ -351,7 +356,7 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         validateLocationAndETag(response4);
 
         // check location
-        validateLocationHeader(Folder.class, response4.getHeaders().getLocation(), mainFolderName, (Folder f) -> f.getName().getValue());
+        validateLocationHeader("FOLDER", response4.getHeaders().getLocation(), mainFolderName, jsonNode -> getFieldValue(jsonNode, "name"));
 
         HttpStatusCodeException httpException1 = assertThrows(
                 HttpStatusCodeException.class,
@@ -385,7 +390,7 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
         assertThat(deletedResponse.getStatusCode()).isEqualTo(NO_CONTENT);
 
         // retrieve deleted directory
-        ResponseEntity<Folder> response5 = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory", Folder.class, ehrId);
+        ResponseEntity<String> response5 = getResponse(getTargetPath() + "/ehr/{ehr_id}/directory", String.class, ehrId);
         assertThat(response5.getStatusCode()).isEqualTo(NO_CONTENT);
 
         // retrieve non-existing directory in the past while the last one has been deleted
@@ -396,16 +401,5 @@ public class OpenEhrFolderRestTest extends AbstractRestTest {
                                   ehrId,
                                   DATE_TIME_FORMATTER.print(atTheBeginning)));
         assertThat(httpException3.getStatusCode()).isEqualTo(NOT_FOUND);
-    }
-
-    private Folder createFolder(String name) {
-        Folder folder = new Folder();
-        folder.setName(ConversionUtils.getText(name));
-
-        Folder folder1 = new Folder();
-        folder1.setName(ConversionUtils.getText(name + "/F1"));
-
-        folder.getFolders().add(folder1);
-        return folder;
     }
 }

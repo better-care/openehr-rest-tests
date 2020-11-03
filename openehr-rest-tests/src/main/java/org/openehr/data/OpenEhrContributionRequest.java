@@ -14,8 +14,7 @@
 
 package org.openehr.data;
 
-import org.openehr.jaxb.rm.Composition;
-import org.openehr.jaxb.rm.PartyIdentified;
+import com.nedap.archie.rm.generic.PartyProxy;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -28,11 +27,10 @@ import java.util.List;
  */
 @SuppressWarnings("rawtypes")
 @XmlRootElement
-@XmlSeeAlso({Composition.class,
-                    PartyIdentified.class,
-                    OpenEhrContributionAudit.class,
-                    OpenEhrContributionVersion.class,
-                    OpenEhrContributionVersion.OpenEhrCommitAudit.class})
+@XmlSeeAlso({PartyProxy.class,
+        OpenEhrContributionAudit.class,
+        OpenEhrContributionVersion.class,
+        OpenEhrContributionVersion.OpenEhrCommitAudit.class})
 public class OpenEhrContributionRequest implements Serializable, Cloneable {
     private static final long serialVersionUID = -5703337964934071501L;
 
