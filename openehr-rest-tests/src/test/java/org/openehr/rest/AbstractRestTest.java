@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Better d.o.o.
+ * Copyright 2020-2021 Better Ltd (www.better.care)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -62,7 +62,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.openehr.data.OpenEhrConstants.POST_COMPOSITION_PATH;
+import static org.openehr.utils.OpenEhrConstants.POST_COMPOSITION_PATH;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.POST;

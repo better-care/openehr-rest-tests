@@ -18,8 +18,7 @@ import java.util.Map;
 import static org.openehr.utils.Utils.getRmTypeName;
 
 /**
- * @author Bostjan Lah
- * @since 13.11.2018
+ * @author Dusan Markovic
  */
 public class RmAwareAsPropertyTypeDeserializer extends AsPropertyTypeDeserializer {
     private static final long serialVersionUID = 1L;

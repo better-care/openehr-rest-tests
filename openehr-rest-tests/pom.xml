@@ -18,14 +18,19 @@
 
     <properties>
         <java.version>11</java.version>
+
+        <openehr-rm.version>0.10.0</openehr-rm.version>
         <commons-io.version>2.6</commons-io.version>
+
+        <spring-boot-maven-plugin.version>2.3.4.RELEASE</spring-boot-maven-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.nedap.healthcare.archie</groupId>
             <artifactId>openehr-rm</artifactId>
-            <version>0.10.0</version>
+            <version>${openehr-rm.version}</version>
         </dependency>
 
         <!-- jaxb -->
@@ -111,12 +116,12 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.3.4.RELEASE</version>
+                    <version>${spring-boot-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M5</version>
+                    <version>${maven-failsafe-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

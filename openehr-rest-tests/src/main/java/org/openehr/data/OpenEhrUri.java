@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Better d.o.o.
+ * Copyright 2020-2021 Better Ltd (www.better.care)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * @author Matic Ribic
+ * @author Dusan Markovic
  */
 public class OpenEhrUri {
     public static final String URL_HEADER_NAME = "openEHR-uri";

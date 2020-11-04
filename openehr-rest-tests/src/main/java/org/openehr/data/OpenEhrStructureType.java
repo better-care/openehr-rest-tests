@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Better d.o.o.
+ * Copyright 2020-2021 Better Ltd (www.better.care)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -17,7 +17,7 @@ package org.openehr.data;
 import java.util.stream.Stream;
 
 /**
- * @author Matic Ribic
+ * @author Dusan Markovic
  */
 public enum OpenEhrStructureType {
     COMPOSITION("compositions"),
