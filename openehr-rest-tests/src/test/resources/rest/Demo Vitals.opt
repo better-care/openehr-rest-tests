@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!--
 
 Copyright (C) 2020 Better d.o.o.
@@ -74,6 +74,7 @@ the License.
                 <lower>1</lower>
                 <upper>1</upper>
             </existence>
+            <match_negated>false</match_negated>
             <children xsi:type="C_COMPLEX_OBJECT">
                 <rm_type_name>DV_CODED_TEXT</rm_type_name>
                 <occurrences>
@@ -95,6 +96,7 @@ the License.
                         <lower>1</lower>
                         <upper>1</upper>
                     </existence>
+                    <match_negated>false</match_negated>
                     <children xsi:type="C_CODE_PHRASE">
                         <rm_type_name>CODE_PHRASE</rm_type_name>
                         <occurrences>
@@ -124,6 +126,7 @@ the License.
                 <lower>0</lower>
                 <upper>1</upper>
             </existence>
+            <match_negated>false</match_negated>
             <children xsi:type="C_COMPLEX_OBJECT">
                 <rm_type_name>EVENT_CONTEXT</rm_type_name>
                 <occurrences>
@@ -145,6 +148,7 @@ the License.
                         <lower>0</lower>
                         <upper>1</upper>
                     </existence>
+                    <match_negated>false</match_negated>
                     <children xsi:type="C_COMPLEX_OBJECT">
                         <rm_type_name>ITEM_TREE</rm_type_name>
                         <occurrences>
@@ -166,6 +170,7 @@ the License.
                                 <lower>0</lower>
                                 <upper>1</upper>
                             </existence>
+                            <match_negated>false</match_negated>
                             <children xsi:type="ARCHETYPE_SLOT">
                                 <rm_type_name>CLUSTER</rm_type_name>
                                 <occurrences>
@@ -220,6 +225,7 @@ the License.
                 <lower>1</lower>
                 <upper>1</upper>
             </existence>
+            <match_negated>false</match_negated>
             <children xsi:type="C_COMPLEX_OBJECT">
                 <rm_type_name>DV_TEXT</rm_type_name>
                 <occurrences>
@@ -241,6 +247,7 @@ the License.
                         <lower>1</lower>
                         <upper>1</upper>
                     </existence>
+                    <match_negated>false</match_negated>
                     <children xsi:type="C_PRIMITIVE_OBJECT">
                         <rm_type_name>STRING</rm_type_name>
                         <occurrences>
@@ -269,6 +276,7 @@ the License.
                 <lower>0</lower>
                 <upper>1</upper>
             </existence>
+            <match_negated>false</match_negated>
             <children xsi:type="C_ARCHETYPE_ROOT">
                 <rm_type_name>SECTION</rm_type_name>
                 <occurrences>
@@ -290,6 +298,7 @@ the License.
                         <lower>1</lower>
                         <upper>1</upper>
                     </existence>
+                    <match_negated>false</match_negated>
                     <children xsi:type="C_COMPLEX_OBJECT">
                         <rm_type_name>DV_TEXT</rm_type_name>
                         <occurrences>
@@ -311,6 +320,7 @@ the License.
                                 <lower>1</lower>
                                 <upper>1</upper>
                             </existence>
+                            <match_negated>false</match_negated>
                             <children xsi:type="C_PRIMITIVE_OBJECT">
                                 <rm_type_name>STRING</rm_type_name>
                                 <occurrences>
@@ -339,6 +349,7 @@ the License.
                         <lower>0</lower>
                         <upper>1</upper>
                     </existence>
+                    <match_negated>false</match_negated>
                     <children xsi:type="C_ARCHETYPE_ROOT">
                         <rm_type_name>OBSERVATION</rm_type_name>
                         <occurrences>
@@ -358,6 +369,7 @@ the License.
                                 <lower>1</lower>
                                 <upper>1</upper>
                             </existence>
+                            <match_negated>false</match_negated>
                             <children xsi:type="C_COMPLEX_OBJECT">
                                 <rm_type_name>HISTORY</rm_type_name>
                                 <occurrences>
@@ -379,6 +391,7 @@ the License.
                                         <lower>0</lower>
                                         <upper>1</upper>
                                     </existence>
+                                    <match_negated>false</match_negated>
                                     <children xsi:type="C_COMPLEX_OBJECT">
                                         <rm_type_name>EVENT</rm_type_name>
                                         <occurrences>
@@ -398,6 +411,7 @@ the License.
                                                 <lower>1</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>ITEM_TREE</rm_type_name>
                                                 <occurrences>
@@ -419,6 +433,7 @@ the License.
                                                         <lower>0</lower>
                                                         <upper>1</upper>
                                                     </existence>
+                                                    <match_negated>false</match_negated>
                                                     <children xsi:type="C_COMPLEX_OBJECT">
                                                         <rm_type_name>ELEMENT</rm_type_name>
                                                         <occurrences>
@@ -440,6 +455,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -475,6 +491,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -510,6 +527,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_CODED_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -531,6 +549,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_CODE_PHRASE">
                                                                         <rm_type_name>CODE_PHRASE</rm_type_name>
                                                                         <occurrences>
@@ -628,6 +647,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_PROPORTION</rm_type_name>
                                                                 <occurrences>
@@ -649,6 +669,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_PRIMITIVE_OBJECT">
                                                                         <rm_type_name>REAL</rm_type_name>
                                                                         <occurrences>
@@ -666,8 +687,8 @@ the License.
                                                                                 <upper_included>true</upper_included>
                                                                                 <lower_unbounded>false</lower_unbounded>
                                                                                 <upper_unbounded>false</upper_unbounded>
-                                                                                <lower>0</lower>
-                                                                                <upper>100</upper>
+                                                                                <lower>0.0</lower>
+                                                                                <upper>100.0</upper>
                                                                             </range>
                                                                         </item>
                                                                     </children>
@@ -682,6 +703,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_PRIMITIVE_OBJECT">
                                                                         <rm_type_name>REAL</rm_type_name>
                                                                         <occurrences>
@@ -699,8 +721,8 @@ the License.
                                                                                 <upper_included>true</upper_included>
                                                                                 <lower_unbounded>false</lower_unbounded>
                                                                                 <upper_unbounded>false</upper_unbounded>
-                                                                                <lower>100</lower>
-                                                                                <upper>100</upper>
+                                                                                <lower>100.0</lower>
+                                                                                <upper>100.0</upper>
                                                                             </range>
                                                                         </item>
                                                                     </children>
@@ -715,6 +737,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_PRIMITIVE_OBJECT">
                                                                         <rm_type_name>BOOLEAN</rm_type_name>
                                                                         <occurrences>
@@ -742,6 +765,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_PRIMITIVE_OBJECT">
                                                                         <rm_type_name>INTEGER</rm_type_name>
                                                                         <occurrences>
@@ -835,6 +859,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -886,6 +911,7 @@ the License.
                                 <lower>0</lower>
                                 <upper>1</upper>
                             </existence>
+                            <match_negated>false</match_negated>
                             <children xsi:type="C_COMPLEX_OBJECT">
                                 <rm_type_name>ITEM_TREE</rm_type_name>
                                 <occurrences>
@@ -907,6 +933,7 @@ the License.
                                         <lower>0</lower>
                                         <upper>1</upper>
                                     </existence>
+                                    <match_negated>false</match_negated>
                                     <children xsi:type="C_COMPLEX_OBJECT">
                                         <rm_type_name>ELEMENT</rm_type_name>
                                         <occurrences>
@@ -928,6 +955,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                 <occurrences>
@@ -992,6 +1020,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                 <occurrences>
@@ -1075,6 +1104,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                 <occurrences>
@@ -1110,6 +1140,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>DV_DATE_TIME</rm_type_name>
                                                 <occurrences>
@@ -1306,6 +1337,7 @@ the License.
                                 <lower>1</lower>
                                 <upper>1</upper>
                             </existence>
+                            <match_negated>false</match_negated>
                             <children xsi:type="C_COMPLEX_OBJECT">
                                 <rm_type_name>HISTORY</rm_type_name>
                                 <occurrences>
@@ -1327,6 +1359,7 @@ the License.
                                         <lower>0</lower>
                                         <upper>1</upper>
                                     </existence>
+                                    <match_negated>false</match_negated>
                                     <children xsi:type="C_COMPLEX_OBJECT">
                                         <rm_type_name>EVENT</rm_type_name>
                                         <occurrences>
@@ -1346,6 +1379,7 @@ the License.
                                                 <lower>1</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>ITEM_TREE</rm_type_name>
                                                 <occurrences>
@@ -1367,6 +1401,7 @@ the License.
                                                         <lower>0</lower>
                                                         <upper>1</upper>
                                                     </existence>
+                                                    <match_negated>false</match_negated>
                                                     <children xsi:type="C_COMPLEX_OBJECT">
                                                         <rm_type_name>ELEMENT</rm_type_name>
                                                         <occurrences>
@@ -1388,6 +1423,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_DV_QUANTITY">
                                                                 <rm_type_name>DV_QUANTITY</rm_type_name>
                                                                 <occurrences>
@@ -1451,6 +1487,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_CODED_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -1472,6 +1509,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_CODE_PHRASE">
                                                                         <rm_type_name>CODE_PHRASE</rm_type_name>
                                                                         <occurrences>
@@ -1516,6 +1554,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>ITEM_TREE</rm_type_name>
                                                 <occurrences>
@@ -1537,6 +1576,7 @@ the License.
                                                         <lower>0</lower>
                                                         <upper>1</upper>
                                                     </existence>
+                                                    <match_negated>false</match_negated>
                                                     <children xsi:type="C_COMPLEX_OBJECT">
                                                         <rm_type_name>ELEMENT</rm_type_name>
                                                         <occurrences>
@@ -1558,6 +1598,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_CODED_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -1579,6 +1620,7 @@ the License.
                                                                         <lower>1</lower>
                                                                         <upper>1</upper>
                                                                     </existence>
+                                                                    <match_negated>false</match_negated>
                                                                     <children xsi:type="C_CODE_PHRASE">
                                                                         <rm_type_name>CODE_PHRASE</rm_type_name>
                                                                         <occurrences>
@@ -1731,6 +1773,7 @@ the License.
                                                                 <lower>0</lower>
                                                                 <upper>1</upper>
                                                             </existence>
+                                                            <match_negated>false</match_negated>
                                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                                 <occurrences>
@@ -1782,6 +1825,7 @@ the License.
                                 <lower>0</lower>
                                 <upper>1</upper>
                             </existence>
+                            <match_negated>false</match_negated>
                             <children xsi:type="C_COMPLEX_OBJECT">
                                 <rm_type_name>ITEM_TREE</rm_type_name>
                                 <occurrences>
@@ -1803,6 +1847,7 @@ the License.
                                         <lower>0</lower>
                                         <upper>1</upper>
                                     </existence>
+                                    <match_negated>false</match_negated>
                                     <children xsi:type="C_COMPLEX_OBJECT">
                                         <rm_type_name>ELEMENT</rm_type_name>
                                         <occurrences>
@@ -1824,6 +1869,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>DV_CODED_TEXT</rm_type_name>
                                                 <occurrences>
@@ -1845,6 +1891,7 @@ the License.
                                                         <lower>1</lower>
                                                         <upper>1</upper>
                                                     </existence>
+                                                    <match_negated>false</match_negated>
                                                     <children xsi:type="C_CODE_PHRASE">
                                                         <rm_type_name>CODE_PHRASE</rm_type_name>
                                                         <occurrences>
@@ -1898,6 +1945,7 @@ the License.
                                                 <lower>0</lower>
                                                 <upper>1</upper>
                                             </existence>
+                                            <match_negated>false</match_negated>
                                             <children xsi:type="C_COMPLEX_OBJECT">
                                                 <rm_type_name>DV_TEXT</rm_type_name>
                                                 <occurrences>

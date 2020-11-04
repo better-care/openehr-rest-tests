@@ -36,15 +36,6 @@ public class OpenEhrTemplateDefinition {
     public OpenEhrTemplateDefinition() {
     }
 
-//    public OpenEhrTemplateDefinition(String templateId, OffsetDateTime createdTimestamp, Template template) {
-//        this.templateId = templateId;
-//        this.createdTimestamp = createdTimestamp;
-//        concept = template.getConcept();
-//        archetypeId = template.getDefinition() == null || template.getDefinition().getArchetypeId() == null
-//                ? null
-//                : template.getDefinition().getArchetypeId().getValue();
-//    }
-
     @XmlElement(name = "template_id", required = true)
     @JsonProperty("template_id")
     public String getTemplateId() {
