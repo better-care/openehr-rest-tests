@@ -41,30 +41,6 @@ public class LocatableUid implements Serializable {
         }
     }
 
-    public String getUid() {
-        return this.uid;
-    }
-
-    public String getSystemId() {
-        return this.systemId;
-    }
-
-    public int getVersion() {
-        return this.version;
-    }
-
-    public LocatableUid previous() {
-        return this.version == 1 ? null : new LocatableUid(this.uid, this.systemId, this.version - 1);
-    }
-
-    public LocatableUid next() {
-        return new LocatableUid(this.uid, this.systemId, this.version + 1);
-    }
-
-    public String toString() {
-        return this.uid + "::" + this.systemId + "::" + this.version;
-    }
-
     public static boolean isSimple(String uid) {
         return (Boolean)applyUid(uid, (x) -> {
             return false;
@@ -86,6 +62,33 @@ public class LocatableUid implements Serializable {
         }
     }
 
+    public String getUid() {
+        return this.uid;
+    }
+
+    public String getSystemId() {
+        return this.systemId;
+    }
+
+    public int getVersion() {
+        return this.version;
+    }
+
+    public LocatableUid previous() {
+        return this.version == 1 ? null : new LocatableUid(this.uid, this.systemId, this.version - 1);
+    }
+
+    public LocatableUid next() {
+        return new LocatableUid(this.uid, this.systemId, this.version + 1);
+    }
+
+    public int hashCode() {
+        int result = this.uid.hashCode();
+        result = 31 * result + this.systemId.hashCode();
+        result = 31 * result + this.version;
+        return result;
+    }
+
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -101,10 +104,7 @@ public class LocatableUid implements Serializable {
         }
     }
 
-    public int hashCode() {
-        int result = this.uid.hashCode();
-        result = 31 * result + this.systemId.hashCode();
-        result = 31 * result + this.version;
-        return result;
+    public String toString() {
+        return this.uid + "::" + this.systemId + "::" + this.version;
     }
 }

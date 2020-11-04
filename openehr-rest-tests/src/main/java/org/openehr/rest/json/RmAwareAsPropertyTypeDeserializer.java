@@ -27,27 +27,6 @@ public class RmAwareAsPropertyTypeDeserializer extends AsPropertyTypeDeserialize
         super(src, property);
     }
 
-    @SuppressWarnings("AssignmentToMethodParameter")
-    @Override
-    protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt, TokenBuffer tb) throws IOException {
-        JsonDeserializer<Object> deser = ctxt.findRootValueDeserializer(ctxt.getTypeFactory().constructType(Map.class));
-        if (tb != null) {
-            tb.writeEndObject();
-            p = tb.asParser(p);
-            // must move to point to the first token:
-            p.nextToken();
-        }
-        return deser.deserialize(p, ctxt);
-    }
-
-    @Override
-    public Object deserializeTypedFromAny(JsonParser p, DeserializationContext ctxt) throws IOException {
-        if (p.getCurrentToken() == JsonToken.START_ARRAY) {
-            return ctxt.findRootValueDeserializer(ctxt.getTypeFactory().constructType(Collection.class)).deserialize(p, ctxt);
-        }
-        return deserializeTypedFromObject(p, ctxt);
-    }
-
     @Override
     public TypeDeserializer forProperty(BeanProperty prop) {
         TypeDeserializer typeDeserializer = super.forProperty(prop);
@@ -105,6 +84,27 @@ public class RmAwareAsPropertyTypeDeserializer extends AsPropertyTypeDeserialize
             return _deserializeTypedForId(p, ctxt, tb, getRmTypeName(rawClass));
         }
         return _deserializeTypedUsingDefaultImpl(p, ctxt, tb);
+    }
+
+    @SuppressWarnings("AssignmentToMethodParameter")
+    @Override
+    protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, DeserializationContext ctxt, TokenBuffer tb) throws IOException {
+        JsonDeserializer<Object> deser = ctxt.findRootValueDeserializer(ctxt.getTypeFactory().constructType(Map.class));
+        if (tb != null) {
+            tb.writeEndObject();
+            p = tb.asParser(p);
+            // must move to point to the first token:
+            p.nextToken();
+        }
+        return deser.deserialize(p, ctxt);
+    }
+
+    @Override
+    public Object deserializeTypedFromAny(JsonParser p, DeserializationContext ctxt) throws IOException {
+        if (p.getCurrentToken() == JsonToken.START_ARRAY) {
+            return ctxt.findRootValueDeserializer(ctxt.getTypeFactory().constructType(Collection.class)).deserialize(p, ctxt);
+        }
+        return deserializeTypedFromObject(p, ctxt);
     }
 
     @SuppressWarnings("resource")

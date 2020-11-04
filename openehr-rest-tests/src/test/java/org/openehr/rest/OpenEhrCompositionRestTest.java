@@ -20,10 +20,10 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openehr.utils.OpenEhrConstants;
 import org.openehr.data.OpenEhrErrorResponse;
 import org.openehr.rest.conf.WebClientConfiguration;
 import org.openehr.utils.LocatableUid;
+import org.openehr.utils.OpenEhrConstants;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -334,7 +334,7 @@ public class OpenEhrCompositionRestTest extends AbstractRestTest {
         String compositionUid = new LocatableUid(versionUid).getUid();
 
         ResponseEntity<JsonNode> response1 = exchange(getTargetPath() + GET_COMPOSITION_PATH, PUT, compositionUpdated, JsonNode.class,
-                                                         headers, ehrId, compositionUid);
+                                                      headers, ehrId, compositionUid);
         assertThat(response1.getStatusCode()).isEqualTo(OK);
         validateLocationAndETag(response1);
         JsonNode body1 = response1.getBody();

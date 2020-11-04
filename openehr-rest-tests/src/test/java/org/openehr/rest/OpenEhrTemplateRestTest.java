@@ -57,7 +57,7 @@ public class OpenEhrTemplateRestTest extends AbstractRestTest {
     @Test
     public void upload() throws IOException {
         String templateString = IOUtils.toString(OpenEhrTemplateRestTest.class.getResourceAsStream("/rest/Demo Vitals.opt"), StandardCharsets.UTF_8)
-                .trim().replaceFirst("^([\\W]+)<","<");
+                .trim().replaceFirst("^([\\W]+)<", "<");
 
         // full representation
         HttpHeaders headers = fullRepresentationHeaders();

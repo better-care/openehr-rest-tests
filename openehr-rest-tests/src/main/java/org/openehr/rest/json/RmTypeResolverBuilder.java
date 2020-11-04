@@ -30,6 +30,15 @@ public class RmTypeResolverBuilder extends ObjectMapper.DefaultTypeResolverBuild
     }
 
     @Override
+    public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
+        TypeDeserializer typeDeserializer = super.buildTypeDeserializer(config, baseType, subtypes);
+        if (typeDeserializer instanceof AsPropertyTypeDeserializer) {
+            return new RmAwareAsPropertyTypeDeserializer((AsPropertyTypeDeserializer)typeDeserializer, null);
+        }
+        return typeDeserializer;
+    }
+
+    @Override
     public TypeSerializer buildTypeSerializer(SerializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
 
         if (_idType == JsonTypeInfo.Id.NONE) {
@@ -46,15 +55,6 @@ public class RmTypeResolverBuilder extends ObjectMapper.DefaultTypeResolverBuild
         }
 
         return super.buildTypeSerializer(config, baseType, subtypes);
-    }
-
-    @Override
-    public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
-        TypeDeserializer typeDeserializer = super.buildTypeDeserializer(config, baseType, subtypes);
-        if (typeDeserializer instanceof AsPropertyTypeDeserializer) {
-            return new RmAwareAsPropertyTypeDeserializer((AsPropertyTypeDeserializer)typeDeserializer, null);
-        }
-        return typeDeserializer;
     }
 
     @Override

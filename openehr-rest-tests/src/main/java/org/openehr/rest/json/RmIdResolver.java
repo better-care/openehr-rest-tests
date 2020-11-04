@@ -23,18 +23,18 @@ import static org.openehr.utils.Utils.getRmTypeName;
  * @author Dusan Markovic
  */
 public class RmIdResolver implements TypeIdResolver {
-    private JavaType baseType;
     private final TypeFactory typeFactory;
-
     @SuppressWarnings("AnonymousInnerClassMayBeStatic")
     private final LoadingCache<Class<?>, String> rmClassNames = CacheBuilder.newBuilder()
             .maximumSize(1000L)
-            .build(new CacheLoader<Class<?>, String>() {
+            .build(new CacheLoader<>() {
                 @Override
                 public String load(@Nonnull Class<?> clazz) {
                     return getRmTypeName(clazz);
                 }
             });
+
+    private JavaType baseType;
 
     public RmIdResolver() {
         this(TypeFactory.defaultInstance());
