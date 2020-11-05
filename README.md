@@ -43,7 +43,16 @@
 </plugin>
 ```
 
-3. Run the tests
+3. Configure EHR server parameters in `application-test.properties`:
+
+| Property key    | Description |
+| --------------- | ----------- |
+| `openehr.rest.uri`  | REST endpoint of OpenEHR server |
+| `auth.basic.username`  | Username for basic auth. If not set, there is no authentication |
+| `auth.basic.password`  | Password for basic auth |
+| `openehr.conformance`  | Settings for conformance OPTIONS [call](https://specifications.openehr.org/releases/ITS-REST/Release-1.0.0/ehr.html#design-considerations-options-and-conformance) |
+
+4. Run the tests
 
 ```
 mvn clean test

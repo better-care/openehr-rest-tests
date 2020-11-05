@@ -14,11 +14,16 @@
 
 package org.openehr.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openehr.data.OpenEhrErrorResponse;
 import org.openehr.rest.conf.WebClientConfiguration;
+import org.openehr.utils.LocatableUid;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -34,6 +39,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.http.HttpHeaders.IF_MATCH;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.*;
@@ -46,6 +52,8 @@ import static org.springframework.http.HttpStatus.*;
 @TestPropertySource(value = "classpath:application-test.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {WebClientConfiguration.class})
 public class OpenEhrEhrRestTest extends AbstractRestTest {
+
+    private static final String PARTY_REF_UID = UUID.randomUUID().toString();
 
     @Test
     public void createEhrWithDefaultEhrStatus() throws IOException {
@@ -68,29 +76,7 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
         assertThat(ehrStatus.has("is_queryable")).isTrue();
         assertThat(ehrStatus.has("is_modifiable")).isTrue();
 
-        String ehrStatus1 = "{\n" +
-                "  \"_type\": \"EHR_STATUS\",\n" +
-                "  \"archetype_node_id\": \"archetype_node_id\",\n" +
-                "  \"name\": {\n" +
-                "    \"_type\": \"DV_TEXT\",\n" +
-                "    \"value\": \"status name\"\n" +
-                "  },\n" +
-                "  \"subject\": {\n" +
-                "    \"_type\": \"PARTY_SELF\"," +
-                "    \"external_ref\": {\n" +
-                "      \"_type\": \"PARTY_REF\"," +
-                "      \"id\": {\n" +
-                "        \"_type\": \"GENERIC_ID\",\n" +
-                "        \"value\": \"" + createRandomNumString() + "\",\n" +
-                "        \"scheme\": \"id_scheme\"\n" +
-                "      },\n" +
-                "      \"namespace\": \"local\",\n" +
-                "      \"type\": \"PERSON\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"is_modifiable\": \"true\",\n" +
-                "  \"is_queryable\": \"false\"\n" +
-                "}";
+        String ehrStatus1 = createEhrStatusString(true, false, "local", createRandomNumString());
         ResponseEntity<JsonNode> response3 = exchange(getTargetPath() + "/ehr", POST, ehrStatus1, JsonNode.class, headers);
         assertThat(response3.getStatusCode()).isEqualTo(CREATED);
         assertThat(response3.getBody()).isNotNull();
@@ -147,30 +133,7 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
         HttpHeaders headers = fullRepresentationHeaders();
         String ehrUid = UUID.randomUUID().toString();
         String genericId = createRandomNumString();
-        ResponseEntity<JsonNode> response1 = createEhrWithProvidedUidAndStatus(
-                "{\n" +
-                        "  \"_type\": \"EHR_STATUS\",\n" +
-                        "  \"archetype_node_id\": \"archetype_node_id\",\n" +
-                        "  \"name\": {\n" +
-                        "    \"_type\": \"DV_TEXT\",\n" +
-                        "    \"value\": \"status name\"\n" +
-                        "  },\n" +
-                        "  \"subject\": {\n" +
-                        "    \"_type\": \"PARTY_SELF\"," +
-                        "    \"external_ref\": {\n" +
-                        "      \"_type\": \"PARTY_REF\"," +
-                        "      \"id\": {\n" +
-                        "        \"_type\": \"GENERIC_ID\",\n" +
-                        "        \"value\": \"" + genericId + "\",\n" +
-                        "        \"scheme\": \"id_scheme\"\n" +
-                        "      },\n" +
-                        "      \"namespace\": \"local\",\n" +
-                        "      \"type\": \"PERSON\"\n" +
-                        "    }\n" +
-                        "  },\n" +
-                        "  \"is_modifiable\": \"true\",\n" +
-                        "  \"is_queryable\": \"true\"\n" +
-                        "}", headers, ehrUid);
+        ResponseEntity<JsonNode> response1 = createEhrWithProvidedUidAndStatus(createEhrStatusString(true, true, "local", genericId), headers, ehrUid);
         assertThat(response1.getStatusCode()).isEqualTo(CREATED);
         JsonNode testEhr = response1.getBody();
         assertThat(testEhr).isNotNull();
@@ -218,30 +181,7 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
         HttpHeaders headers = fullRepresentationHeaders();
         HttpStatusCodeException httpException = assertThrows(
                 HttpStatusCodeException.class,
-                () -> createEhrWithProvidedStatusExpectError(
-                        "{\n" +
-                                "  \"_type\": \"EHR_STATUS\",\n" +
-                                "  \"archetype_node_id\": \"archetype_node_id\",\n" +
-                                "  \"name\": {\n" +
-                                "    \"_type\": \"DV_TEXT\",\n" +
-                                "    \"value\": \"status name\"\n" +
-                                "  },\n" +
-                                "  \"subject\": {\n" +
-                                "    \"_type\": \"PARTY_SELF\"," +
-                                "    \"external_ref\": {\n" +
-                                "      \"_type\": \"PARTY_REF\"," +
-                                "      \"id\": {\n" +
-                                "        \"_type\": \"GENERIC_ID\",\n" +
-                                "        \"value\": \"" + createRandomNumString() + "\",\n" +
-                                "        \"scheme\": \"id_scheme\"\n" +
-                                "      },\n" +
-                                "      \"namespace\": \"\",\n" +
-                                "      \"type\": \"PERSON\"\n" +
-                                "    }\n" +
-                                "  },\n" +
-                                "  \"is_modifiable\": \"true\",\n" +
-                                "  \"is_queryable\": \"true\"\n" +
-                                "}", headers, String.class));
+                () -> createEhrWithProvidedStatusExpectError(createEhrStatusString(true, true, "", createRandomNumString()), headers, String.class));
         assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
         String body = httpException.getResponseBodyAsString();
         assertThat(body).isNotNull();
@@ -380,357 +320,368 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
         validateLocationAndETag(httpException, false, false);
     }
 
-    //
-//    @Test
-//    public void retrieveEhrBySubjectId() {
-//        String customNamespace = "notDefault";
-//        EhrStatus status = composeEhrStatus(customNamespace);
-//        String ehrUid = UUID.randomUUID().toString();
-//        ResponseEntity<Ehr> response1 = createEhrWithProvidedUidAndStatus(status, null, ehrUid);
-//        assertThat(response1.getStatusCode()).isEqualTo(CREATED);
-//
-//        ResponseEntity<Ehr> response2 = getResponse(getTargetPath() + "/ehr?subject_id={subject_id}&subject_namespace={subject_namespace}", Ehr.class,
-//                                                    PARTY_REF_UID, customNamespace);
-//        assertThat(response2.getStatusCode()).isEqualTo(OK);
-//        Ehr testEhr = response2.getBody();
-//        assertThat(testEhr).isNotNull();
-//        assertThat(testEhr.getEhrId().getValue()).isEqualTo(ehrUid);
-//        assertThat(testEhr.getEhrStatus().getSubject().getExternalRef().getId().getValue()).isEqualTo(PARTY_REF_UID);
-//        assertThat(testEhr.getEhrStatus().getSubject().getExternalRef().getNamespace()).isEqualTo(customNamespace);
-//        validateLocationAndETag(response2, false, false);
-//    }
-//
-//    @Test
-//    public void retrieveEhrBySubjectId404() {
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr?subject_id={subject_id}&subject_namespace={subject_namespace}",
-//                        OpenEhrErrorResponse.class,
-//                        "baltazar",
-//                        "baltazar"));
-//        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
-//        validateLocationAndETag(httpException, false, false);
-//    }
-//
-//    @Test
-//    public void retrieveEhrStatusByTimestamp() {
-//        HttpHeaders headers = fullRepresentationHeaders();
-//        String ehrUid = UUID.randomUUID().toString();
-//        ResponseEntity<Ehr> ehrResponse = createEhrWithProvidedUidAndStatus(null, headers, ehrUid);
-//        assertThat(ehrResponse.getStatusCode()).isEqualTo(CREATED);
-//
-//        DateTime before = DateTime.now();
-//        Ehr testEhr = ehrResponse.getBody();
-//        EhrStatus status = testEhr.getEhrStatus();
-//        status.setQueryable(false);
-//        String versionUid = status.getUid().getValue();
-//        status.setUid(null);
-//
-//        HttpHeaders headers1 = new HttpHeaders();
-//        headers1.set(IF_MATCH, versionUid);
-//        ResponseEntity<EhrStatus> response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, status, EhrStatus.class, headers1, ehrUid);
-//        assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
-//        validateLocationAndETag(response1);
-//
-//        ResponseEntity<EhrStatus> response2 = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                EhrStatus.class,
-//                ehrUid,
-//                DATE_TIME_FORMATTER.print(before));
-//        assertThat(response2.getStatusCode()).isEqualTo(OK);
-//        validateLocationAndETag(response2, false, false);
-//        EhrStatus ehrStatus1 = response2.getBody();
-//        assertThat(ehrStatus1).isNotNull();
-//        assertThat(ehrStatus1.isQueryable()).isTrue();
-//
-//        DateTime after = DateTime.now();
-//        ResponseEntity<EhrStatus> response3 = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                EhrStatus.class,
-//                ehrUid,
-//                DATE_TIME_FORMATTER.print(after));
-//        assertThat(response3.getStatusCode()).isEqualTo(OK);
-//        validateLocationAndETag(response3, false, false);
-//        EhrStatus ehrStatus2 = response3.getBody();
-//        assertThat(ehrStatus2).isNotNull();
-//        assertThat(ehrStatus2.isQueryable()).isFalse();
-//
-//        String invalidDateTimeString = "2018-13-29T12:40:57.995+02:00";
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                        EhrStatus.class,
-//                        ehrUid,
-//                        invalidDateTimeString));
-//        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
-//        validateLocationAndETag(httpException, false, false);
-//        assertThat(httpException.getResponseBodyAsString()).isEmpty();
-//
-//        String future = DATE_TIME_FORMATTER.print(before.minusYears(1));
-//        HttpStatusCodeException httpException1 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                        OpenEhrErrorResponse.class,
-//                        ehrUid,
-//                        future));
-//        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
-//        validateLocationAndETag(httpException1, false, false);
-//        assertThat(httpException1.getResponseBodyAsString()).isNotNull();
-//
-//        HttpStatusCodeException httpException2 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                        String.class,
-//                        ehrUid + "404",
-//                        DATE_TIME_FORMATTER.print(after)));
-//        assertThat(httpException2.getStatusCode()).isEqualTo(NOT_FOUND);
-//
-//        validateLocationAndETag(httpException2, false, false);
-//        assertThat(httpException2.getResponseBodyAsString()).isNotNull();
-//    }
-//
-//    @Test
-//    public void retrieveEhrStatusByVersionUid() {
-//        ResponseEntity<Ehr> ehrResponse = getResponse(getTargetPath() + "/ehr/{ehr_id}", Ehr.class, ehrId);
-//        Ehr testEhr = ehrResponse.getBody();
-//        String ehrUid = testEhr.getEhrId().getValue();
-//        String versionUid = testEhr.getEhrStatus().getUid().getValue();
-//
-//        ResponseEntity<EhrStatus> response1 = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/ehr_status/{version_uid}",
-//                EhrStatus.class,
-//                ehrUid,
-//                versionUid);
-//        assertThat(response1.getStatusCode()).isEqualTo(OK);
-//
-//        validateLocationAndETag(response1, false, false);
-//        EhrStatus ehrStatus = response1.getBody();
-//        assertThat(ehrStatus).isNotNull();
-//
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/ehr_status/{version_uid}",
-//                        String.class,
-//                        ehrUid,
-//                        "blablablabla"));
-//        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
-//
-//        HttpStatusCodeException httpException1 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/ehr_status/{version_uid}",
-//                        String.class,
-//                        "blablablabla",
-//                        versionUid));
-//        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
-//    }
-//
-//    @Test
-//    public void updateEhrStatus() throws JsonProcessingException {
-//        HttpHeaders headers = fullRepresentationHeaders();
-//        ResponseEntity<EhrStatus> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                                                          EhrStatus.class,
-//                                                          ehrId,
-//                                                          "");
-//        assertThat(response1.getStatusCode()).isEqualTo(OK);
-//        EhrStatus requestStatus = response1.getBody();
-//        assertThat(requestStatus.isQueryable()).isTrue();
-//        String uid1 = requestStatus.getUid().getValue();
-//        requestStatus.setQueryable(false);
-//        requestStatus.setUid(null);
-//
-//        headers.set(IF_MATCH, uid1);
-//        ResponseEntity<EhrStatus> response2 = exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, requestStatus, EhrStatus.class, headers, ehrId);
-//        assertThat(response2.getStatusCode()).isEqualTo(OK);
-//        validateLocationAndETag(response2);
-//        EhrStatus ehrStatus = response2.getBody();
-//        assertThat(ehrStatus).isNotNull();
-//        assertThat(ehrStatus.isQueryable()).isFalse();
-//        String uid2 = ehrStatus.getUid().getValue();
-//
-//        headers.set(IF_MATCH, nonExistingUid);
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, requestStatus, EhrStatus.class, headers, ehrId));
-//        assertThat(httpException.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
-//        validateLocationAndETag(httpException);
-//
-//        headers.remove(IF_MATCH);
-//        HttpStatusCodeException httpException1 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, requestStatus, EhrStatus.class, headers, ehrId));
-//        assertThat(httpException1.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
-//        validateLocationAndETag(httpException1);
-//
-//        headers.set(IF_MATCH, uid2);
-//        String malformedJsonString = objectMapper.writeValueAsString(requestStatus).replaceFirst("\\{", "\\}");
-//        HttpStatusCodeException httpException2 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, malformedJsonString, String.class, headers, ehrId));
-//        assertThat(httpException2.getStatusCode()).isEqualTo(BAD_REQUEST);
-//        validateLocationAndETag(httpException2, false, false);
-//    }
-//
-//    @Test
-//    public void retrieveVersionedEhrStatus() {
-//        ResponseEntity<EhrStatus> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                                                          EhrStatus.class,
-//                                                          ehrId,
-//                                                          "");
-//        assertThat(response1.getStatusCode()).isEqualTo(OK);
-//        LocatableUid locatableUid = new LocatableUid(response1.getBody().getUid().getValue());
-//
-//        ResponseEntity<VersionedObjectDto> response = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status",
-//                VersionedObjectDto.class,
-//                ehrId);
-//        assertThat(response.getStatusCode()).isEqualTo(OK);
-//        VersionedObjectDto body = response.getBody();
-//        assertThat(body).isNotNull();
-//        assertThat(body.getUid().getValue()).isEqualTo(locatableUid.getUid());
-//        validateLocationAndETag(response, false, false);
-//    }
-//
-//    @Test
-//    public void retrieveVersionedEhrStatus404() {
-//        ResponseEntity<EhrStatus> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                                                          EhrStatus.class,
-//                                                          ehrId,
-//                                                          "");
-//        assertThat(response1.getStatusCode()).isEqualTo(OK);
-//        String uid = response1.getBody().getUid().getValue();
-//        // 404 nonexistent ehr
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
-//                        JsonNode.class,
-//                        "blablablabla",
-//                        uid));
-//        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
-//
-//        // 404 nonexistent version_uid
-//        HttpStatusCodeException httpException1 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
-//                        JsonNode.class,
-//                        ehrId,
-//                        UUID.randomUUID().toString()));
-//        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
-//    }
-//
-//    @Test
-//    public void retrieveEhrStatusVersion() throws IOException {
-//        super.setUp();
-//
-//        ResponseEntity<EhrStatus> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                                                          EhrStatus.class,
-//                                                          ehrId,
-//                                                          "");
-//        assertThat(response1.getStatusCode()).isEqualTo(OK);
-//        String uid = response1.getBody().getUid().getValue();
-//
-//        // 200
-//        ResponseEntity<OriginalVersion> response2 = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
-//                OriginalVersion.class,
-//                ehrId,
-//                uid);
-//        assertThat(response2.getStatusCode()).isEqualTo(OK);
-//        OriginalVersion body = response2.getBody();
-//        assertThat(body).isNotNull();
-//        assertThat(body.getPrecedingVersionUid()).isNull();
-//        assertThat(body.getData()).isNotNull();
+
+    @Test
+    public void retrieveEhrBySubjectId() {
+        String customNamespace = "notDefault";
+        String status = createEhrStatusString(true, true, customNamespace, PARTY_REF_UID);
+        String ehrUid = UUID.randomUUID().toString();
+        ResponseEntity<JsonNode> response1 = createEhrWithProvidedUidAndStatus(status, null, ehrUid);
+        assertThat(response1.getStatusCode()).isEqualTo(CREATED);
+
+        ResponseEntity<JsonNode> response2 = getResponse(
+                getTargetPath() + "/ehr?subject_id={subject_id}&subject_namespace={subject_namespace}", JsonNode.class, PARTY_REF_UID, customNamespace);
+        assertThat(response2.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response2, false, false);
+        JsonNode testEhr = response2.getBody();
+        assertThat(testEhr).isNotNull();
+        assertThat(getFieldValue(testEhr, "ehr_id")).isEqualTo(ehrUid);
+        JsonNode ehrStatus = testEhr.get("ehr_status");
+        assertThat(ehrStatus).isNotNull();
+        assertThat(ehrStatus.get("subject").get("external_ref").get("id").get("value").asText()).isEqualTo(PARTY_REF_UID);
+        assertThat(ehrStatus.get("subject").get("external_ref").get("namespace").asText()).isEqualTo(customNamespace);
+    }
+
+    @Test
+    public void retrieveEhrBySubjectId404() {
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr?subject_id={subject_id}&subject_namespace={subject_namespace}",
+                        OpenEhrErrorResponse.class,
+                        "baltazar",
+                        "baltazar"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException, false, false);
+    }
+
+    @Test
+    public void retrieveEhrStatusByTimestamp() {
+        HttpHeaders headers = fullRepresentationHeaders();
+        String ehrUid = UUID.randomUUID().toString();
+        ResponseEntity<JsonNode> ehrResponse = createEhrWithProvidedUidAndStatus(null, headers, ehrUid);
+        assertThat(ehrResponse.getStatusCode()).isEqualTo(CREATED);
+
+        DateTime before = DateTime.now();
+        JsonNode testEhr = ehrResponse.getBody();
+        JsonNode status = testEhr.get("ehr_status");
+        assertThat(status).isNotNull();
+        String versionUid = getUid(status);
+        ((ObjectNode)status).set("is_queryable", BooleanNode.FALSE);
+        ((ObjectNode)status).set("uid", null);
+
+        HttpHeaders headers1 = new HttpHeaders();
+        headers1.set(IF_MATCH, versionUid);
+        ResponseEntity<JsonNode> response1 = exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, status, JsonNode.class, headers1, ehrUid);
+        assertThat(response1.getStatusCode()).isEqualTo(NO_CONTENT);
+        validateLocationAndETag(response1);
+
+        ResponseEntity<JsonNode> response2 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrUid,
+                DATE_TIME_FORMATTER.print(before));
+        assertThat(response2.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response2, false, false);
+        JsonNode ehrStatus1 = response2.getBody();
+        assertThat(ehrStatus1).isNotNull();
+        assertThat(ehrStatus1.get("is_queryable").asBoolean()).isTrue();
+
+        DateTime after = DateTime.now();
+        ResponseEntity<JsonNode> response3 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrUid,
+                DATE_TIME_FORMATTER.print(after));
+        assertThat(response3.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response3, false, false);
+        JsonNode ehrStatus2 = response3.getBody();
+        assertThat(ehrStatus2).isNotNull();
+        assertThat(ehrStatus2.get("is_queryable").asBoolean()).isFalse();
+
+        String invalidDateTimeString = "2018-13-29T12:40:57.995+02:00";
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                        String.class,
+                        ehrUid,
+                        invalidDateTimeString));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        validateLocationAndETag(httpException, false, false);
+        assertThat(httpException.getResponseBodyAsString()).isEmpty();
+
+        String future = DATE_TIME_FORMATTER.print(before.minusYears(1));
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                        OpenEhrErrorResponse.class,
+                        ehrUid,
+                        future));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+        validateLocationAndETag(httpException1, false, false);
+        assertThat(httpException1.getResponseBodyAsString()).isNotNull();
+
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                        String.class,
+                        ehrUid + "404",
+                        DATE_TIME_FORMATTER.print(after)));
+        assertThat(httpException2.getStatusCode()).isEqualTo(NOT_FOUND);
+
+        validateLocationAndETag(httpException2, false, false);
+        assertThat(httpException2.getResponseBodyAsString()).isNotNull();
+    }
+
+    @Test
+    public void retrieveEhrStatusByVersionUid() {
+        ResponseEntity<JsonNode> ehrResponse = getResponse(getTargetPath() + "/ehr/{ehr_id}", JsonNode.class, ehrId);
+        JsonNode testEhr = ehrResponse.getBody();
+        assertThat(testEhr).isNotNull();
+        String ehrUid = getFieldValue(testEhr, "ehr_id");
+        String versionUid = getUid(testEhr.get("ehr_status"));
+
+        ResponseEntity<JsonNode> response1 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status/{version_uid}",
+                JsonNode.class,
+                ehrUid,
+                versionUid);
+        assertThat(response1.getStatusCode()).isEqualTo(OK);
+
+        validateLocationAndETag(response1, false, false);
+        JsonNode ehrStatus = response1.getBody();
+        assertThat(ehrStatus).isNotNull();
+
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/ehr_status/{version_uid}",
+                        String.class,
+                        ehrUid,
+                        "blablablabla"));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/ehr_status/{version_uid}",
+                        String.class,
+                        "blablablabla",
+                        versionUid));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    public void updateEhrStatus() throws JsonProcessingException {
+        HttpHeaders headers = fullRepresentationHeaders();
+        ResponseEntity<JsonNode> response1 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrId,
+                "");
+        assertThat(response1.getStatusCode()).isEqualTo(OK);
+        JsonNode requestStatus = response1.getBody();
+        assertThat(requestStatus).isNotNull();
+        assertThat(requestStatus.get("is_queryable").asBoolean()).isTrue();
+        String uid1 = getUid(requestStatus);
+        ((ObjectNode)requestStatus).set("is_queryable", BooleanNode.FALSE);
+        ((ObjectNode)requestStatus).set("uid", null);
+
+        headers.set(IF_MATCH, uid1);
+        ResponseEntity<JsonNode> response2 = exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, requestStatus, JsonNode.class, headers, ehrId);
+        assertThat(response2.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response2);
+        JsonNode ehrStatus = response2.getBody();
+        assertThat(ehrStatus).isNotNull();
+        assertThat(ehrStatus.get("is_queryable").asBoolean()).isFalse();
+        String uid2 = getUid(ehrStatus);
+
+        headers.set(IF_MATCH, nonExistingUid);
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, requestStatus, String.class, headers, ehrId));
+        assertThat(httpException.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        validateLocationAndETag(httpException);
+
+        headers.remove(IF_MATCH);
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, requestStatus, String.class, headers, ehrId));
+        assertThat(httpException1.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        validateLocationAndETag(httpException1);
+
+        headers.set(IF_MATCH, uid2);
+        String malformedJsonString = objectMapper.writeValueAsString(requestStatus).replaceFirst("\\{", "\\}");
+        HttpStatusCodeException httpException2 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, malformedJsonString, String.class, headers, ehrId));
+        assertThat(httpException2.getStatusCode()).isEqualTo(BAD_REQUEST);
+        validateLocationAndETag(httpException2, false, false);
+    }
+
+    @Test
+    public void retrieveVersionedEhrStatus() {
+        ResponseEntity<JsonNode> response1 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrId,
+                "");
+        assertThat(response1.getStatusCode()).isEqualTo(OK);
+        LocatableUid locatableUid = new LocatableUid(getUid(response1.getBody()));
+
+        ResponseEntity<JsonNode> response = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status",
+                JsonNode.class,
+                ehrId);
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response, false, false);
+        JsonNode body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(getUid(body)).isEqualTo(locatableUid.getUid());
+    }
+
+    @Test
+    public void retrieveVersionedEhrStatus404() {
+        ResponseEntity<JsonNode> response1 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrId,
+                "");
+        assertThat(response1.getStatusCode()).isEqualTo(OK);
+        String uid = getUid(response1.getBody());
+        // 404 nonexistent ehr
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
+                        String.class,
+                        "blablablabla",
+                        uid));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+
+        // 404 nonexistent version_uid
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
+                        String.class,
+                        ehrId,
+                        UUID.randomUUID().toString()));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    public void retrieveEhrStatusVersion() throws IOException {
+        super.setUp();
+
+        ResponseEntity<JsonNode> response1 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrId,
+                "");
+        assertThat(response1.getStatusCode()).isEqualTo(OK);
+        String uid = getUid(response1.getBody());
+
+        // 200
+        ResponseEntity<JsonNode> response2 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
+                JsonNode.class,
+                ehrId,
+                uid);
+        assertThat(response2.getStatusCode()).isEqualTo(OK);
+        JsonNode body = response2.getBody();
+        assertThat(body).isNotNull();
+        JsonNode ehrStatus = body.get("preceding_version_uid");
+        assertThat(body.has("preceding_version_uid")).isFalse();
+        assertThat(body.get("data")).isNotNull();
 //        assertThat(body.getData()).isOfAnyClassIn(EhrStatus.class);
-//        assertThat(((Locatable)body.getData()).getUid().getValue()).isEqualTo(uid);
-//        validateLocationAndETag(response2, false, false);
-//
-//        // 404 nonexistent ehr
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
-//                        String.class,
-//                        "blablablabla",
-//                        uid));
-//        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
-//
-//        // 404 nonexistent version
-//        HttpStatusCodeException httpException1 = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
-//                        String.class,
-//                        ehrId,
-//                        UUID.randomUUID().toString()));
-//        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
-//    }
-//
-//    @Test
-//    public void retrieveEhrStatusVersionAtTime() throws InterruptedException {
-//        DateTime before = DateTime.now();
-//        Thread.sleep(100);
-//
-//        ResponseEntity<EhrStatus> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
-//                                                          EhrStatus.class,
-//                                                          ehrId,
-//                                                          "");
-//        assertThat(response1.getStatusCode()).isEqualTo(OK);
-//        EhrStatus status = response1.getBody();
-//        String versionUid = status.getUid().getValue();
-//
-//        LocatableUid oldLocatableUid = new LocatableUid(status.getUid().getValue());
-//        status.setUid(null);
-//
-//        HttpHeaders headers1 = new HttpHeaders();
-//        headers1.set(IF_MATCH, versionUid);
-//        ResponseEntity<EhrStatus> response2 = exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, status, EhrStatus.class, headers1, ehrId);
-//        assertThat(response2.getStatusCode()).isEqualTo(NO_CONTENT);
-//        validateLocationAndETag(response2);
-//
-//        ResponseEntity<OriginalVersion> response3 = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version?version_at_time={version_at_time}",
-//                OriginalVersion.class,
-//                ehrId,
-//                DATE_TIME_FORMATTER.print(before));
-//        assertThat(response3.getStatusCode()).isEqualTo(OK);
-//        validateLocationAndETag(response3);
-//        OriginalVersion body1 = response3.getBody();
-//        assertThat(body1).isNotNull();
-//        assertThat(body1.getData()).isNotNull();
-//        assertThat(body1.getUid().getValue()).isEqualTo(oldLocatableUid.toString());
-//
-//        ResponseEntity<OriginalVersion> response4 = getResponse(
-//                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version?version_at_time={version_at_time}",
-//                OriginalVersion.class,
-//                ehrId,
-//                DATE_TIME_FORMATTER.print(DateTime.now()));
-//        assertThat(response4.getStatusCode()).isEqualTo(OK);
-//        validateLocationAndETag(response4);
-//        OriginalVersion body2 = response4.getBody();
-//        assertThat(body2).isNotNull();
-//        assertThat(body2.getData()).isNotNull();
-//        assertThat(body2.getUid().getValue()).isEqualTo(oldLocatableUid.next().toString());
-//
-//        String invalidDateTimeString = "2018-13-29T12:40:57.995+02:00";
-//        HttpStatusCodeException httpException = assertThrows(
-//                HttpStatusCodeException.class,
-//                () -> getResponse(
-//                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version?version_at_time={version_at_time}",
-//                        OriginalVersion.class,
-//                        ehrId,
-//                        invalidDateTimeString));
-//        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
-//        assertThat(httpException.getResponseBodyAsString()).isEmpty();
-//        validateLocationAndETag(httpException, false, false);
-//    }
-//
+        assertThat(getUid(body.get("data"))).isEqualTo(uid);
+        validateLocationAndETag(response2, false, false);
+
+        // 404 nonexistent ehr
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
+                        String.class,
+                        "blablablabla",
+                        uid));
+        assertThat(httpException.getStatusCode()).isEqualTo(NOT_FOUND);
+
+        // 404 nonexistent version
+        HttpStatusCodeException httpException1 = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}",
+                        String.class,
+                        ehrId,
+                        UUID.randomUUID().toString()));
+        assertThat(httpException1.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    public void retrieveEhrStatusVersionAtTime() throws InterruptedException {
+        DateTime before = DateTime.now();
+        Thread.sleep(100);
+
+        ResponseEntity<JsonNode> response1 = getResponse(getTargetPath() + "/ehr/{ehr_id}/ehr_status?version_at_time={version_at_time}",
+                                                         JsonNode.class,
+                                                         ehrId,
+                                                         "");
+        assertThat(response1.getStatusCode()).isEqualTo(OK);
+        JsonNode status = response1.getBody();
+        assertThat(status).isNotNull();
+        String versionUid = getUid(status);
+
+        LocatableUid oldLocatableUid = new LocatableUid(versionUid);
+        ((ObjectNode)status).set("uid", null);
+
+        HttpHeaders headers1 = new HttpHeaders();
+        headers1.set(IF_MATCH, versionUid);
+        ResponseEntity<JsonNode> response2 = exchange(getTargetPath() + "/ehr/{ehr_id}/ehr_status", PUT, status, JsonNode.class, headers1, ehrId);
+        assertThat(response2.getStatusCode()).isEqualTo(NO_CONTENT);
+        validateLocationAndETag(response2);
+
+        ResponseEntity<JsonNode> response3 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrId,
+                DATE_TIME_FORMATTER.print(before));
+        assertThat(response3.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response3);
+        JsonNode body1 = response3.getBody();
+        assertThat(body1).isNotNull();
+        assertThat(body1.get("data")).isNotNull();
+        assertThat(getUid(body1)).isEqualTo(oldLocatableUid.toString());
+
+        ResponseEntity<JsonNode> response4 = getResponse(
+                getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version?version_at_time={version_at_time}",
+                JsonNode.class,
+                ehrId,
+                DATE_TIME_FORMATTER.print(DateTime.now()));
+        assertThat(response4.getStatusCode()).isEqualTo(OK);
+        validateLocationAndETag(response4);
+        JsonNode body2 = response4.getBody();
+        assertThat(body2).isNotNull();
+        assertThat(body2.get("data")).isNotNull();
+        assertThat(getUid(body2)).isEqualTo(oldLocatableUid.next().toString());
+
+        String invalidDateTimeString = "2018-13-29T12:40:57.995+02:00";
+        HttpStatusCodeException httpException = assertThrows(
+                HttpStatusCodeException.class,
+                () -> getResponse(
+                        getTargetPath() + "/ehr/{ehr_id}/versioned_ehr_status/version?version_at_time={version_at_time}",
+                        String.class,
+                        ehrId,
+                        invalidDateTimeString));
+        assertThat(httpException.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(httpException.getResponseBodyAsString()).isEmpty();
+        validateLocationAndETag(httpException, false, false);
+    }
+
     private ResponseEntity<JsonNode> createEhrWithProvidedUidAndStatus(Object ehrStatus, HttpHeaders headers, String ehrUid) {
         return exchange(getTargetPath() + "/ehr/{ehr_id}", PUT, ehrStatus, JsonNode.class, headers, ehrUid);
     }
@@ -738,19 +689,30 @@ public class OpenEhrEhrRestTest extends AbstractRestTest {
     private <T> ResponseEntity<T> createEhrWithProvidedStatusExpectError(Object ehrStatus, HttpHeaders headers, Class<T> responseType) {
         return exchange(getTargetPath() + "/ehr/{ehr_id}", PUT, ehrStatus, responseType, headers, UUID.randomUUID().toString());
     }
-//
-//    private EhrStatus composeEhrStatus(String customNamespace) {
-//        EhrStatus status = new EhrStatus();
-//        PartySelf subject = new PartySelf();
-//        status.setName(ConversionUtils.getText("status"));
-//        status.setArchetypeNodeId("status.archetype.node");
-//        PartyRef partyRef = new PartyRef();
-//        partyRef.setId(ConversionUtils.getHierObjectId(PARTY_REF_UID));
-//        partyRef.setNamespace(customNamespace);
-//        partyRef.setType("some_type");
-//
-//        subject.setExternalRef(partyRef);
-//        status.setSubject(subject);
-//        return status;
-//    }
+
+    private String createEhrStatusString(boolean isModifiable, boolean isQueryable, String namespace, String partyId) {
+        return "{\n" +
+                "  \"_type\": \"EHR_STATUS\",\n" +
+                "  \"archetype_node_id\": \"archetype_node_id\",\n" +
+                "  \"name\": {\n" +
+                "    \"_type\": \"DV_TEXT\",\n" +
+                "    \"value\": \"status name\"\n" +
+                "  },\n" +
+                "  \"subject\": {\n" +
+                "    \"_type\": \"PARTY_SELF\"," +
+                "    \"external_ref\": {\n" +
+                "      \"_type\": \"PARTY_REF\"," +
+                "      \"id\": {\n" +
+                "        \"_type\": \"GENERIC_ID\",\n" +
+                "        \"value\": \"" + partyId + "\",\n" +
+                "        \"scheme\": \"id_scheme\"\n" +
+                "      },\n" +
+                "      \"namespace\": \"" + namespace + "\",\n" +
+                "      \"type\": \"PERSON\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"is_modifiable\": \"" + isModifiable + "\",\n" +
+                "  \"is_queryable\": \"" + isQueryable + "\"\n" +
+                "}";
+    }
 }
