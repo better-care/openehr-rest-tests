@@ -43,7 +43,7 @@
 </plugin>
 ```
 
-3. Configure EHR server parameters in `application-test.properties`:
+3. Configure EHR server parameters in `application-test.properties-TEMPLATE` and rename it to `application-test.properties`:
 
 | Property key    | Description |
 | --------------- | ----------- |

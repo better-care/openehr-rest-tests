@@ -1,0 +1,11 @@
+openehr.rest.uri=openehr endpoint
+auth.basic.username=username
+auth.basic.password=password
+openehr.conformance.solution=Solution
+openehr.conformance.vendor=Vendor name
+openehr.conformance.restapi-specs-version=1.0.0
+openehr.conformance.profile=STANDARD
+openehr.conformance.endpoints=definition,ehr,query,contribution,composition,directory
+
+
+
